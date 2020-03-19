@@ -7,6 +7,7 @@ package scene;
 
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class scene extends Canvas {
             object.update();
         }
         canvas.clear();
+        bird_flock.draw_COM(canvas);
         redraw_scene();
     }
 }

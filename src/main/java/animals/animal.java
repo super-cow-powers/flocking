@@ -47,7 +47,16 @@ public class animal {
     }
 
     public void set_angle(double new_angle) {
+        new_angle=new_angle - Math.PI/2; //Shift it round so that it default faces up.
+        if (new_angle>2*Math.PI){
+            new_angle-=2*Math.PI;
+        } else if (new_angle<(-2)*Math.PI){
+            new_angle+=2*Math.PI;
+        }
+        
         angle = new_angle;
+        
+        //System.out.printf("angle %f\n", angle);
     }
 
     public void set_angular_velocity(double angular_vel) {
@@ -72,11 +81,12 @@ public class animal {
     
     public void update_segments(){
         CartesianCoordinate pointA,pointB;
+        double TempAngle = angle;
         int i=0;
         while (i<3){
-                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(angle))*10),(position.getY() + (Math.cos(angle))*10));
-                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(angle+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(angle+((2*Math.PI)/3)))*10));
-                    angle=(float) (angle+((2*Math.PI)/3));
+                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle))*10),(position.getY() + (Math.cos(TempAngle))*10));
+                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(TempAngle+((2*Math.PI)/3)))*10));
+                    TempAngle=(TempAngle +((2*Math.PI)/3));
                     segments[i] = new LineSegment(pointA, pointB);
                     segments[i].set_rgba(0, 0, 0, 255);
                     i++;

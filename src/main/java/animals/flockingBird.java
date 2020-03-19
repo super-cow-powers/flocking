@@ -17,7 +17,7 @@ public final class flockingBird extends animal {
     public flockingBird(double xLoc, double yLoc) {
         name="flocking bird";
         speed=0;
-        angle=0;
+        angle=-Math.PI/2; //Default face upwards
         angular_velocity=0;
         position=new CartesianCoordinate(xLoc, yLoc);
         segments=new LineSegment[3];
@@ -26,12 +26,13 @@ public final class flockingBird extends animal {
     
     @Override
     public void update_segments(){
-        CartesianCoordinate pointA,pointB;
+       CartesianCoordinate pointA,pointB;
+        double TempAngle = angle;
         int i=0;
         while (i<3){
-                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(angle))*10),(position.getY() + (Math.cos(angle))*10));
-                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(angle+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(angle+((2*Math.PI)/3)))*10));
-                    angle=(float) (angle+((2*Math.PI)/3));
+                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle))*10),(position.getY() + (Math.cos(TempAngle))*10));
+                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(TempAngle+((2*Math.PI)/3)))*10));
+                    TempAngle=(TempAngle +((2*Math.PI)/3));
                     segments[i] = new LineSegment(pointA, pointB);
                     i++;
                 }

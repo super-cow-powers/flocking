@@ -112,9 +112,9 @@ public class Canvas extends JPanel {
         LineSegment segment;
         synchronized (lines) {
             while (i < 2 * Math.PI) {
-                pointA = new CartesianCoordinate((centrePoint.getX() + (Math.sin(i)) * radius), (centrePoint.getX() + (Math.cos(i)) * radius));
+                pointA = new CartesianCoordinate((centrePoint.getX() + (Math.sin(i)) * radius), (centrePoint.getY() + (Math.cos(i)) * radius));
                 pointB = new CartesianCoordinate((centrePoint.getX() + (Math.sin(i + ((2 * Math.PI) / complexity))) * radius), 
-                        (centrePoint.getX() + (Math.cos(i + ((2 * Math.PI) / complexity))) * radius));
+                        (centrePoint.getY() + (Math.cos(i + ((2 * Math.PI) / complexity))) * radius));
                 segment = new LineSegment(pointA, pointB);
                 segment.set_colour(colour);
                 lines.add(segment);
