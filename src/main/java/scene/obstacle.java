@@ -37,7 +37,7 @@ public final class obstacle implements scene_object{
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.draw_circle(centre, radius, 100, Color.red);
+        canvas.draw_circle(centre, radius, 100, 0, Color.red);
     }
 
     @Override

@@ -33,6 +33,7 @@ public class scene extends Canvas {
         try {
             Obstacle = new obstacle(obstacle_loc, obstacle_radius, obstacle_complexity);
             bird_flock = new flock(flock_num, "flocking bird");
+            bird_flock.set_cohesion(1); //Set the cohesion level
             establish();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(scene.class.getName()).log(Level.SEVERE, null, ex);

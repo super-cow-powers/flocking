@@ -102,31 +102,45 @@ public class Canvas extends JPanel {
         }
         repaint();
     }
+    
+    /*
+    *Returns the segments for the requested polygon
+    */
+    private LineSegment[] get_circleLineSegments(CartesianCoordinate centrePoint, float radius, int complexity, double angle, Color colour){
+     LineSegment[] segments = new LineSegment[complexity];
+     CartesianCoordinate pointA, pointB;
+        LineSegment segment;
+        double TempAngle = angle;
+        synchronized (lines) {
+            for (int i=0;i < complexity;i++) {
+                pointA=new CartesianCoordinate((centrePoint.getX() + (Math.sin(TempAngle-(Math.PI/2)))*radius),(centrePoint.getY() + (Math.cos(TempAngle-(Math.PI/2)))*radius));
+                    pointB=new CartesianCoordinate((centrePoint.getX() + (Math.sin(TempAngle-(Math.PI/2)+((2*Math.PI)/complexity)))*radius),
+                            (centrePoint.getY() + (Math.cos(TempAngle-(Math.PI/2)+((2*Math.PI)/complexity)))*radius));
+                segments[i] = new LineSegment(pointA, pointB);  
+                segments[i].set_colour(colour);
+                TempAngle=(TempAngle +((2*Math.PI)/complexity));
+            }
+        
+        return segments;
+    }
+    }
     /*
     Draws a circle or radius, about the centre-point.
     Complexity specifies the number of points to compute.
     This could also be called draw polygon.
     */
-    public void draw_circle(CartesianCoordinate centrePoint, float radius, int complexity, Color colour) { 
-        float i = 0;
-        CartesianCoordinate pointA, pointB;
-        LineSegment segment;
-        synchronized (lines) {
-            while (i < 2 * Math.PI) {
-                pointA = new CartesianCoordinate((centrePoint.getX() + (Math.sin(i)) * radius), (centrePoint.getY() + (Math.cos(i)) * radius));
-                pointB = new CartesianCoordinate((centrePoint.getX() + (Math.sin(i + ((2 * Math.PI) / complexity))) * radius), 
-                        (centrePoint.getY() + (Math.cos(i + ((2 * Math.PI) / complexity))) * radius));
-                segment = new LineSegment(pointA, pointB);
-                segment.set_colour(colour);
-                lines.add(segment);
-                i = (float) (i + ((2 * Math.PI) / complexity));
-            }
-            repaint();
+    public void draw_circle(CartesianCoordinate centrePoint, float radius, int complexity, double angle, Color colour) { 
+        LineSegment[] segments = get_circleLineSegments(centrePoint, radius, complexity, angle, colour);
+        drawLineSegments(segments);
         }
-    }
+    
 
-    public void draw_triangle(CartesianCoordinate centrePoint, float radius, float angle, Color colour) {
-        draw_circle(centrePoint, radius, 3, colour); //A triangle is a polygon with 3 points.
+    public void draw_triangle(CartesianCoordinate centrePoint, float radius, double angle, Color colour0, Color colour1, Color colour2) {
+        LineSegment[] segments = get_circleLineSegments(centrePoint, radius, 3, angle, Color.black); //A triangle is a polygon with 3 points.
+        segments[1].set_colour(colour1);
+        segments[0].set_colour(colour0);
+        segments[2].set_colour(colour2);
+        drawLineSegments(segments);
     }
 
     /**
