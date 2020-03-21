@@ -8,6 +8,7 @@ package scene;
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
 import geometry.LineSegment;
+import java.awt.Color;
 
 /**
  *
@@ -23,19 +24,7 @@ public final class obstacle implements scene_object{
     public obstacle(CartesianCoordinate centre_loc, int size, int complexity) {
         centre = centre_loc;
         radius = size;
-        segments = new LineSegment[complexity];
-        float angle=0;
-        int i=0;
-        CartesianCoordinate pointA, pointB;
-        while (angle<2*Math.PI){
-                    pointA=new CartesianCoordinate((centre.getX() + (Math.sin(angle))*radius),(centre.getY()+ (Math.cos(angle))*radius));
-                    pointB=new CartesianCoordinate((centre.getX() + (Math.sin(angle+((2*Math.PI)/complexity)))*radius),(centre.getY()+ (Math.cos(angle+((2*Math.PI)/complexity)))*radius));
-                    angle=(float) (angle+((2*Math.PI)/complexity));
-                    segments[i]=new LineSegment(pointA, pointB);
-                    segments[i].set_rgba(255, 100, 0, 255);
-                    i++;
-                }
-    }
+            }
 
     public int get_radius() {
         return radius;
@@ -48,7 +37,7 @@ public final class obstacle implements scene_object{
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawLineSegments(segments);
+        canvas.draw_circle(centre, radius, 100, Color.red);
     }
 
     @Override

@@ -8,9 +8,9 @@ package scene;
 import animals.*;
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
-import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  *
@@ -35,7 +35,7 @@ public class flock implements scene_object {
                 flock_members = new flockingBird[size];
                 while (j < size) {
                     for (int k = 0; k < 25 * (int) (size / 4); k += 25) {
-                        System.out.printf("%d\n", j);
+                        //System.out.printf("%d\n", j);
                         flock_members[j] = new flockingBird(10 + k, 10 + i);
                         j++;
                         if (j == size) {
@@ -69,15 +69,9 @@ public class flock implements scene_object {
         }
     }
 
-    public void draw_COM(Canvas canvas) {
-        for (int i = 0; i < flock_members.length; i++) {
-            canvas.draw_circle(flock_members[i].get_local_COM(), 10, 5, Color.blue);
-
-        }
-    }
 
     public void update() {
-        /*//Threaded version
+        //Threaded version
         Thread t, t1, t2; //Create 3 calculation threads to split the large task
         t = new Thread(new Runnable() { // Create an anonymous inner class that implements Runnable interface
             @Override
@@ -94,10 +88,10 @@ public class flock implements scene_object {
                         if ((separation(flock_members[i], flock_members[j]) < radius)) {
                             averageX += flock_members[j].get_position().getX();
                             averageY += flock_members[j].get_position().getY();
-                            System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
+                            //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
                         }
                     }
-                    System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
+                    //System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
                     averageX = averageX / (flock_members.length);
                     averageY = averageY / (flock_members.length);
                     member.set_local_COM(new CartesianCoordinate(averageX, averageY));
@@ -120,10 +114,10 @@ public class flock implements scene_object {
                         if ((separation(flock_members[i], flock_members[j]) < radius)) {
                             averageX += flock_members[j].get_position().getX();
                             averageY += flock_members[j].get_position().getY();
-                            System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
+                            //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
                         }
                     }
-                    System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
+                    //System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
                     averageX = averageX / (flock_members.length);
                     averageY = averageY / (flock_members.length);
                     member.set_local_COM(new CartesianCoordinate(averageX, averageY));
@@ -146,10 +140,10 @@ public class flock implements scene_object {
                         if ((separation(flock_members[i], flock_members[j]) < radius)) {
                             averageX += flock_members[j].get_position().getX();
                             averageY += flock_members[j].get_position().getY();
-                            System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
+                            //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
                         }
                     }
-                    System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
+                    //System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
                     averageX = averageX / (flock_members.length);
                     averageY = averageY / (flock_members.length);
 
@@ -174,9 +168,9 @@ public class flock implements scene_object {
         for (animal flock_member : flock_members) {
             //System.out.printf("COM: (%f,%f)\n", flock_member.get_local_COM().getX(),flock_member.get_local_COM().getX());
 
-        }*/
+        }
         //Single Threaded version
-        animal member;
+        /*animal member;
         double averageX, averageY, angle;
         for (int i = 0; i < (int) (flock_members.length); i++) {
             averageX = 0;
@@ -202,7 +196,7 @@ public class flock implements scene_object {
         for (animal flock_member : flock_members) {
             System.out.printf("ANG: (%f)\n", flock_member.get_angle());
 
-        }
+        }*/
 
     }
 

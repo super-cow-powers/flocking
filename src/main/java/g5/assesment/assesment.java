@@ -46,7 +46,7 @@ public class assesment {
     public static void main(String[] args) {
      CartesianCoordinate obstacle_location = new CartesianCoordinate(350, 250);  
      assesment assesmentMain = new assesment();
-     assesmentMain.setup_scene(obstacle_location,75,10);
+     assesmentMain.setup_scene(obstacle_location,75,50);
      assesmentMain.loop();
     }
 

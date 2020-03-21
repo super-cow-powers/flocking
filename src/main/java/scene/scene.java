@@ -70,7 +70,6 @@ public class scene extends Canvas {
             object.update();
         }
         canvas.clear();
-        bird_flock.draw_COM(canvas);
         redraw_scene();
     }
 }

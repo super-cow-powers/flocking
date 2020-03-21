@@ -7,6 +7,7 @@ package animals;
 
 import geometry.CartesianCoordinate;
 import geometry.LineSegment;
+import java.awt.Color;
 
 /**
  *
@@ -47,7 +48,6 @@ public class animal {
     }
 
     public void set_angle(double new_angle) {
-        new_angle=new_angle - Math.PI/2; //Shift it round so that it default faces up.
         if (new_angle>2*Math.PI){
             new_angle-=2*Math.PI;
         } else if (new_angle<(-2)*Math.PI){
@@ -79,17 +79,23 @@ public class animal {
         local_centre = COM;
     }
     
+    protected void Set_RGBA(){ //Override to set custom colour to sub-class
+        segments[1].set_rgba(0, 0, 0, 200);
+        segments[0].set_rgba(0,0,0,200);
+        segments[2].set_rgba(0,0,0,200);
+    }
+    
     public void update_segments(){
         CartesianCoordinate pointA,pointB;
         double TempAngle = angle;
         int i=0;
         while (i<3){
-                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle))*10),(position.getY() + (Math.cos(TempAngle))*10));
-                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(TempAngle+((2*Math.PI)/3)))*10));
+                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle-(Math.PI/2)))*10),(position.getY() + (Math.cos(TempAngle-(Math.PI/2)))*10));
+                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle-(Math.PI/2)+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(TempAngle-(Math.PI/2)+((2*Math.PI)/3)))*10));
                     TempAngle=(TempAngle +((2*Math.PI)/3));
                     segments[i] = new LineSegment(pointA, pointB);
-                    segments[i].set_rgba(0, 0, 0, 255);
                     i++;
                 }
+        Set_RGBA();
     }
 }

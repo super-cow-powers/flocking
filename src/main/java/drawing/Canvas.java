@@ -104,9 +104,10 @@ public class Canvas extends JPanel {
     }
     /*
     Draws a circle or radius, about the centre-point.
-    Colmpexity specifies the number of points to compute
+    Complexity specifies the number of points to compute.
+    This could also be called draw polygon.
     */
-    public void draw_circle(CartesianCoordinate centrePoint, float radius, int complexity, Color colour) {
+    public void draw_circle(CartesianCoordinate centrePoint, float radius, int complexity, Color colour) { 
         float i = 0;
         CartesianCoordinate pointA, pointB;
         LineSegment segment;
@@ -125,21 +126,7 @@ public class Canvas extends JPanel {
     }
 
     public void draw_triangle(CartesianCoordinate centrePoint, float radius, float angle, Color colour) {
-        float i = 0;
-        LineSegment segment;
-        CartesianCoordinate pointA, pointB;
-        synchronized (lines) {
-            while (i < 3) {
-                pointA = new CartesianCoordinate((centrePoint.getX() + (Math.sin(angle)) * radius), (centrePoint.getX() + (Math.cos(angle)) * radius));
-                pointB = new CartesianCoordinate((centrePoint.getX() + (Math.sin(angle + ((2 * Math.PI) / 3))) * radius), (centrePoint.getX() + (Math.cos(angle + ((2 * Math.PI) / 3))) * radius));
-                angle = (float) (angle + ((2 * Math.PI) / 3));
-                segment = new LineSegment(pointA, pointB);
-                segment.set_colour(colour);
-                lines.add(segment);
-                i++;
-            }
-        }
-
+        draw_circle(centrePoint, radius, 3, colour); //A triangle is a polygon with 3 points.
     }
 
     /**
