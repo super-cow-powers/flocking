@@ -19,6 +19,7 @@ public class animal {
     double angle;
     double angular_velocity;
     double cohesion;
+    double alignment;
     CartesianCoordinate position;
     String name;
     LineSegment[] segments;
@@ -70,6 +71,13 @@ public class animal {
     
     public double cohesion(){
         return cohesion;
+    }
+    public void set_alignment(double ammount){
+        alignment = ammount;
+    }
+    
+    public double alignment(){
+        return alignment;
     }
 
     public void set_position(CartesianCoordinate new_position) {

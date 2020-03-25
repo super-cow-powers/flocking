@@ -16,5 +16,5 @@ import drawing.Canvas;
  */
 public interface scene_object {
     public void draw(Canvas canvas);
-    public void update();
+    public void update(Canvas canvas);
 }

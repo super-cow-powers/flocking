@@ -112,8 +112,8 @@ public class flock implements scene_object {
         }
     }
     @Override
-    public void update() {
-        
+    public void update(Canvas canvas) {
+        double Canvaswidth=canvas.getWidth(),Canvasheight=canvas.getHeight();
         //update_ST();
         
         /*Threaded version. 
@@ -127,15 +127,28 @@ public class flock implements scene_object {
             public void run() {
                 // Thread's running behavior
                 animal member;
-                double averageX, averageY;
+                double averageX, averageY, averageAng, newAng;
                 for (int i = 0; i < (int) (flock_members.length / 3); i++) {
                     averageX = 0;
                     averageY = 0;
+                    averageAng = 0;
                     member = flock_members[i];
+                    /* //Code to wrap animal to other side of window
+                    if (member.get_position().getX() > Canvaswidth){
+                        member.set_position(new CartesianCoordinate(0, member.get_position().getY()));
+                    } else if (member.get_position().getX() < 0){
+                        member.set_position(new CartesianCoordinate(Canvaswidth, member.get_position().getY()));
+                    }
+                    if (member.get_position().getY() > Canvasheight){
+                        member.set_position(new CartesianCoordinate(member.get_position().getX(), 0));
+                    } else if (member.get_position().getY() < 0){
+                        member.set_position(new CartesianCoordinate(member.get_position().getX(), Canvasheight));
+                    }*/
                     for (int j = 0; j < flock_members.length; j++) {
                         if ((separation(flock_members[i], flock_members[j]) < radius)) {
                             averageX += flock_members[j].get_position().getX();
                             averageY += flock_members[j].get_position().getY();
+                            averageAng += flock_members[j].get_angle();
                             //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
                         }
                     }
@@ -143,7 +156,10 @@ public class flock implements scene_object {
                     averageX = averageX / (flock_members.length);
                     averageY = averageY / (flock_members.length);
                     member.set_local_COM(new CartesianCoordinate(averageX, averageY));
-                    member.set_angle(Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX)*member.cohesion());
+                    averageAng = averageAng / (flock_members.length);
+                    newAng = Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX)*member.cohesion();
+                    newAng = newAng+(averageAng - newAng)*member.alignment(); //Sum of centre of mass angle, and average angle*allignment factor.
+                    member.set_angle(newAng); //If alignment == 1, then the angle here will equal the average angle.
                     member.update_segments();
                     
                 }
@@ -153,15 +169,18 @@ public class flock implements scene_object {
             @Override
             public void run() {
                 animal member;
-                double averageX, averageY;
+                double averageX, averageY, averageAng, newAng;
                 for (int i = (int) (flock_members.length / 3); i < (int) (2 * flock_members.length / 3); i++) {
                     averageX = 0;
                     averageY = 0;
+                    averageAng = 0;
                     member = flock_members[i];
+                    
                     for (int j = 0; j < flock_members.length; j++) {
                         if ((separation(flock_members[i], flock_members[j]) < radius)) {
                             averageX += flock_members[j].get_position().getX();
                             averageY += flock_members[j].get_position().getY();
+                            averageAng += flock_members[j].get_angle();
                             //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
                         }
                     }
@@ -169,7 +188,10 @@ public class flock implements scene_object {
                     averageX = averageX / (flock_members.length);
                     averageY = averageY / (flock_members.length);
                     member.set_local_COM(new CartesianCoordinate(averageX, averageY));
-                    member.set_angle(Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX)*member.cohesion());
+                    averageAng = averageAng / (flock_members.length);
+                    newAng = Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX)*member.cohesion();
+                    newAng = newAng+(averageAng - newAng)*member.alignment(); //Sum of centre of mass angle, and average angle*allignment factor.
+                    member.set_angle(newAng); //If alignment == 1, then the angle here will equal the average angle.
                     member.update_segments();
                     
                 }
@@ -179,15 +201,17 @@ public class flock implements scene_object {
             @Override
             public void run() {
                 animal member;
-                double averageX, averageY;
+                double averageX, averageY, averageAng, newAng;
                 for (int i = (int) (2 * flock_members.length / 3); i < (int) (flock_members.length); i++) {
                     averageX = 0;
                     averageY = 0;
+                    averageAng = 0;
                     member = flock_members[i];
                     for (int j = 0; j < flock_members.length; j++) {
                         if ((separation(flock_members[i], flock_members[j]) < radius)) {
                             averageX += flock_members[j].get_position().getX();
                             averageY += flock_members[j].get_position().getY();
+                            averageAng += flock_members[j].get_angle();
                             //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
                         }
                     }
@@ -196,7 +220,10 @@ public class flock implements scene_object {
                     averageY = averageY / (flock_members.length);
 
                     member.set_local_COM(new CartesianCoordinate(averageX, averageY));
-                    member.set_angle(Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX)*member.cohesion());
+                    averageAng = averageAng / (flock_members.length);
+                    newAng = Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX)*member.cohesion();
+                    newAng = newAng+(averageAng - newAng)*member.alignment(); //Sum of centre of mass angle, and average angle*allignment factor.
+                    member.set_angle(newAng); //If alignment == 1, then the angle here will equal the average angle.
                     member.update_segments();
                     
                 }

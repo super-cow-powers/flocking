@@ -68,7 +68,7 @@ public class scene extends Canvas {
     
     public void update_scene(){
         for (scene_object object : scene_objects){
-            object.update();
+            object.update(canvas);
         }
         canvas.clear();
         redraw_scene();

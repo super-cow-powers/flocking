@@ -41,7 +41,7 @@ public final class obstacle implements scene_object{
     }
 
     @Override
-    public void update() {
+    public void update(Canvas canvas) {
         //Not applicable to this (static) object
     }
 }
