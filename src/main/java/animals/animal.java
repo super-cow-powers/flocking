@@ -5,9 +5,10 @@
  */
 package animals;
 
+
 import geometry.CartesianCoordinate;
 import geometry.LineSegment;
-import java.awt.Color;
+
 
 /**
  *
@@ -18,8 +19,6 @@ public class animal {
     double speed;
     double angle;
     double angular_velocity;
-    double cohesion;
-    double alignment;
     CartesianCoordinate position;
     String name;
     LineSegment[] segments;
@@ -45,8 +44,9 @@ public class animal {
         return segments;
     }
 
-    public void set_speed(double new_speed) {
-        speed = new_speed;
+    public void set_speed(double new_speed) { //Always positive
+        speed = Math.abs(new_speed);
+        
     }
 
     public void set_angle(double new_angle) {
@@ -65,20 +65,6 @@ public class animal {
         angular_velocity = angular_vel;
     }
     
-    public void set_cohesion(double ammount){
-        cohesion = ammount;
-    }
-    
-    public double cohesion(){
-        return cohesion;
-    }
-    public void set_alignment(double ammount){
-        alignment = ammount;
-    }
-    
-    public double alignment(){
-        return alignment;
-    }
 
     public void set_position(CartesianCoordinate new_position) {
         position = new_position;
@@ -115,4 +101,5 @@ public class animal {
                 }
         Set_RGBA();
     }
+
 }

@@ -31,12 +31,15 @@ public class assesment {
     }
     
     private void loop(){
-        try {
+/*        try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Logger.getLogger(assesment.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
+        for (int i=0; i<10; i++){
         active_scene.update_scene();
+        }
+        
         while(true){
          //Run main loop
      }

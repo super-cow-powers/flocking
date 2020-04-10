@@ -30,14 +30,11 @@ public class scene extends Canvas {
     private final int WINDOW_Y_SIZE = 600;
 
     public scene(CartesianCoordinate obstacle_loc, int obstacle_radius, int obstacle_complexity, int flock_num) {
-        try {
             Obstacle = new obstacle(obstacle_loc, obstacle_radius, obstacle_complexity);
-            bird_flock = new flock(flock_num, "flocking bird");
-            bird_flock.set_cohesion(1); //Set the cohesion level
+            bird_flock = new flock(flock_num);
+            bird_flock.set_cohesion(0.4); //Set the cohesion level
+            bird_flock.set_alignment(0.5); //Set the alignment level
             establish();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(scene.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     private void establish() {
@@ -61,11 +58,15 @@ public class scene extends Canvas {
         redraw_scene();
     }
     private void redraw_scene(){
+        long startTime = System.nanoTime();
         for (scene_object object : scene_objects){
             object.draw(canvas);
         }
+        long endTime = System.nanoTime();
+        System.out.printf("time %d\n", (endTime-startTime));
     }
     
+
     public void update_scene(){
         for (scene_object object : scene_objects){
             object.update(canvas);
