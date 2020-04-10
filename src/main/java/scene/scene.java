@@ -19,7 +19,7 @@ import javax.swing.JFrame;
  *
  * @author david
  */
-public class scene extends Canvas {
+public class scene{
 
     private flock bird_flock;
     private obstacle Obstacle;
@@ -28,12 +28,13 @@ public class scene extends Canvas {
     private Canvas canvas;
     private final int WINDOW_X_SIZE = 800;
     private final int WINDOW_Y_SIZE = 600;
+    private final double default_cohesion=0.4;
+    private final double default_alignment=0.6;
 
     public scene(CartesianCoordinate obstacle_loc, int obstacle_radius, int obstacle_complexity, int flock_num) {
             Obstacle = new obstacle(obstacle_loc, obstacle_radius, obstacle_complexity);
-            bird_flock = new flock(flock_num);
-            bird_flock.set_cohesion(0.4); //Set the cohesion level
-            bird_flock.set_alignment(0.5); //Set the alignment level
+            bird_flock = new flock(flock_num, default_cohesion, default_alignment);
+            
             establish();
     }
 
@@ -52,12 +53,18 @@ public class scene extends Canvas {
         });
         canvas = new Canvas();
         frame.getContentPane().add(canvas);
-        
+        JFrame.setDefaultLookAndFeelDecorated(true);
         scene_objects.add(Obstacle);
         scene_objects.add(bird_flock);
         redraw_scene();
     }
-    private void redraw_scene(){
+    
+    /*
+    This method must be called to draw, usually after an update.
+    It is likely NOT thread safe! You have been warned!!
+    */
+    public void redraw_scene(){
+        canvas.clear();
         long startTime = System.nanoTime();
         for (scene_object object : scene_objects){
             object.draw(canvas);
@@ -71,7 +78,5 @@ public class scene extends Canvas {
         for (scene_object object : scene_objects){
             object.update(canvas);
         }
-        canvas.clear();
-        redraw_scene();
     }
 }

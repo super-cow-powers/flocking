@@ -8,8 +8,6 @@ package scene;
 import animals.*;
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
-import java.awt.Color;
-import java.lang.reflect.Member;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,7 +22,7 @@ public class flock implements scene_object {
     private CartesianCoordinate flock_centre;
     private float radius = 200;
 
-    flock(int size){
+    flock(int size, double cohesion, double alignment){
 
                 int j = 0,
                  i = 0;
@@ -32,7 +30,7 @@ public class flock implements scene_object {
                 while (j < size) {
                     for (int k = 0; k < 25 * (int) (size / 4); k += 25) {
                         //System.out.printf("%d\n", j);
-                        flock_members[j] = new flockingBird(10 + k, 10 + i);
+                        flock_members[j] = new flockingBird(10 + k, 10 + i, cohesion, alignment);
                         j++;
                         if (j == size) {
                             break;
