@@ -7,12 +7,9 @@ package scene;
 
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
-import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /**
@@ -28,13 +25,13 @@ public class scene{
     private Canvas canvas;
     private final int WINDOW_X_SIZE = 800;
     private final int WINDOW_Y_SIZE = 600;
-    private final double default_cohesion=0.4;
-    private final double default_alignment=0.6;
-
+    private final double default_cohesion=0.7;
+    private final double default_alignment=0.4;
+    private final double default_separation=0.4;
+    
     public scene(CartesianCoordinate obstacle_loc, int obstacle_radius, int obstacle_complexity, int flock_num) {
             Obstacle = new obstacle(obstacle_loc, obstacle_radius, obstacle_complexity);
-            bird_flock = new flock(flock_num, default_cohesion, default_alignment);
-            
+            bird_flock = new flock(flock_num, default_cohesion, default_alignment, default_separation);
             establish();
     }
 
@@ -42,7 +39,7 @@ public class scene{
         scene_objects = new ArrayList<scene_object>();
         frame = new JFrame();
         frame.setTitle("Canvas");
-        frame.setSize(800, 600);
+        frame.setSize(WINDOW_X_SIZE, WINDOW_Y_SIZE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
@@ -51,8 +48,10 @@ public class scene{
                 System.exit(0);
             }
         });
-        canvas = new Canvas();
+        canvas = new Canvas(frame);
         frame.getContentPane().add(canvas);
+        Canvas newcan; 
+        newcan = (Canvas)frame.getContentPane().getComponent(0);
         JFrame.setDefaultLookAndFeelDecorated(true);
         scene_objects.add(Obstacle);
         scene_objects.add(bird_flock);
@@ -65,12 +64,12 @@ public class scene{
     */
     public void redraw_scene(){
         canvas.clear();
-        long startTime = System.nanoTime();
+        //long startTime = System.nanoTime();
         for (scene_object object : scene_objects){
             object.draw(canvas);
         }
-        long endTime = System.nanoTime();
-        System.out.printf("time %d\n", (endTime-startTime));
+        //long endTime = System.nanoTime();
+        //System.out.printf("time %d\n", (endTime-startTime));
     }
     
 

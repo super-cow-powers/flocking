@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import geometry.CartesianCoordinate;
 import geometry.LineSegment;
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
+import javax.swing.JFrame;
 
 /**
  * <h2>Canvas</h2> This class represents a canvas object that can be drawn to
@@ -35,6 +37,7 @@ public class Canvas extends JPanel {
     private static final long serialVersionUID = 1L;
     private int xSize, ySize;
     private List<LineSegment> lines;
+    private List<animals.animal> birds;
     private final static int DEFAULT_X = 800;
     private final static int DEFAULT_Y = 600;
 
@@ -42,7 +45,7 @@ public class Canvas extends JPanel {
      * Default constructor which produces a canvas of the default size of 800 x
      * 600.
      */
-    public Canvas() {
+    public Canvas(JFrame frame) {
         this(DEFAULT_X, DEFAULT_Y);
     }
 
@@ -57,6 +60,7 @@ public class Canvas extends JPanel {
         ySize = y;
         setupCanvas();
         lines = Collections.synchronizedList(new ArrayList<LineSegment>());
+        birds = Collections.synchronizedList(new ArrayList<animals.animal>());
     }
 
     private void setupCanvas() {
@@ -85,6 +89,15 @@ public class Canvas extends JPanel {
                         line.getEndPoint().getX(), line.getEndPoint().getY()));
             }
         }
+        synchronized (birds) {
+            for (animals.animal bird : birds) {
+                AffineTransform old = g2.getTransform();
+                g.translate((int)bird.get_position().getX(), (int)bird.get_position().getY());
+                g2.rotate(bird.get_angle()+Math.PI/2);
+                g2.drawImage(bird.get_image(), 0, 0, null);
+                g2.setTransform(old);
+            }
+        }
     }
 
     /**
@@ -102,38 +115,36 @@ public class Canvas extends JPanel {
         }
         repaint();
     }
-    
+
     /*
     *Returns the segments for the requested polygon
-    */
-    private LineSegment[] get_circleLineSegments(CartesianCoordinate centrePoint, float radius, int complexity, double angle, Color colour){
-     LineSegment[] segments = new LineSegment[complexity];
-     CartesianCoordinate pointA, pointB;
-        LineSegment segment;
+     */
+    static public LineSegment[] get_circleLineSegments(CartesianCoordinate centrePoint, float radius, int complexity, double angle, Color colour) {
+        LineSegment[] segments = new LineSegment[complexity];
+        CartesianCoordinate pointA, pointB;
         double TempAngle = angle;
-        synchronized (lines) {
-            for (int i=0;i < complexity;i++) {
-                pointA=new CartesianCoordinate((centrePoint.getX() + (Math.sin(TempAngle-(Math.PI/2)))*radius),(centrePoint.getY() + (Math.cos(TempAngle-(Math.PI/2)))*radius));
-                    pointB=new CartesianCoordinate((centrePoint.getX() + (Math.sin(TempAngle-(Math.PI/2)+((2*Math.PI)/complexity)))*radius),
-                            (centrePoint.getY() + (Math.cos(TempAngle-(Math.PI/2)+((2*Math.PI)/complexity)))*radius));
-                segments[i] = new LineSegment(pointA, pointB);  
-                segments[i].set_colour(colour);
-                TempAngle=(TempAngle +((2*Math.PI)/complexity));
-            }
-        
+        for (int i = 0; i < complexity; i++) {
+            pointA = new CartesianCoordinate((centrePoint.getX() + (Math.sin(TempAngle - (Math.PI / 2))) * radius), (centrePoint.getY() + (Math.cos(TempAngle - (Math.PI / 2))) * radius));
+            pointB = new CartesianCoordinate((centrePoint.getX() + (Math.sin(TempAngle - (Math.PI / 2) + ((2 * Math.PI) / complexity))) * radius),
+                    (centrePoint.getY() + (Math.cos(TempAngle - (Math.PI / 2) + ((2 * Math.PI) / complexity))) * radius));
+            segments[i] = new LineSegment(pointA, pointB);
+            segments[i].set_colour(colour);
+            TempAngle = (TempAngle + ((2 * Math.PI) / complexity));
+        }
+
         return segments;
+
     }
-    }
+
     /*
     Draws a circle or radius, about the centre-point.
     Complexity specifies the number of points to compute.
     This could also be called draw polygon.
-    */
-    public void draw_circle(CartesianCoordinate centrePoint, float radius, int complexity, double angle, Color colour) { 
+     */
+    public void draw_circle(CartesianCoordinate centrePoint, float radius, int complexity, double angle, Color colour) {
         LineSegment[] segments = get_circleLineSegments(centrePoint, radius, complexity, angle, colour);
         drawLineSegments(segments);
-        }
-    
+    }
 
     public void draw_triangle(CartesianCoordinate centrePoint, float radius, double angle, Color colour0, Color colour1, Color colour2) {
         LineSegment[] segments = get_circleLineSegments(centrePoint, radius, 3, angle, Color.black); //A triangle is a polygon with 3 points.
@@ -166,6 +177,11 @@ public class Canvas extends JPanel {
                 lines.add(thisLineSegment);
             }
         }
+        repaint();
+    }
+
+    public void drawBird(animals.animal bird) {
+        birds.add(bird);
         repaint();
     }
 

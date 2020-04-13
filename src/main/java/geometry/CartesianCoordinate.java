@@ -25,4 +25,18 @@ public class CartesianCoordinate {
     public double getY(){
         return yPosition;
     }
+    
+    public double distance_to(CartesianCoordinate B){
+        return dist_between(this, B);
+    }
+    
+    public static double dist_between(CartesianCoordinate A, CartesianCoordinate B) {
+        return Math.sqrt(Math.abs(Math.pow(A.getX() - B.getX(), 2))
+                + Math.abs(Math.pow(A.getY() - B.getY(), 2)));
+    }
+    
+    public static double angle_between(CartesianCoordinate Centre, CartesianCoordinate Point){
+        return Math.atan2(Point.getY() - Centre.getY(), Point.getX() - Centre.getX());
+        //return Math.atan2(B.getY(), B.getX()) - Math.atan2(A.getY(), A.getX());
+    }
 }

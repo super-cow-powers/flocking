@@ -8,6 +8,11 @@ package animals;
 
 import geometry.CartesianCoordinate;
 import geometry.LineSegment;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import javax.swing.ImageIcon;
 
 
 /**
@@ -15,22 +20,39 @@ import geometry.LineSegment;
  * @author david
  */
 public class animal {
-
-    double speed;
-    double angle;
+    static final Random r = new Random();
+    double speed;/* In px/s */
+    double angle; /* in rads */
+    double view_angle; /* in rads. How far the animal can see */
+    double view_radius; /* In px */ 
     double angular_velocity;
+    BufferedImage image;
     CartesianCoordinate position;
     String name;
-    LineSegment[] segments;
     CartesianCoordinate local_centre;
+    
     //String type;
 
     public animal() {
     }
 
-    public double get_speed() {
-        return speed;
+        /*
+    Returns the distance between current bird and a coordinate
+     */
+    
+    public double get_distance(CartesianCoordinate point_to) {
+        double length;
+        length = position.distance_to(point_to);
+        return length;
     }
+    
+    public CartesianCoordinate Get_New_Position(){
+        double distance = speed/60;
+        return new CartesianCoordinate(position.getX()+(Math.cos(angle)*distance), (Math.sin(angle)*distance)+position.getY());
+        //System.out.printf("New Pos (%f,%f) delX %f delY %f angle %f dist %f\n", position.getX(),position.getY(),Math.cos(angle)*distance, Math.sin(angle)*distance, angle, distance);
+    }
+    
+   
 
     public double get_angle() {
         return angle;
@@ -40,14 +62,14 @@ public class animal {
         return angular_velocity;
     }
 
-    public LineSegment[] get_segments() {
-        return segments;
+     public double get_speed() {
+        return speed;
     }
-
+    
     public void set_speed(double new_speed) { //Always positive
         speed = Math.abs(new_speed);
-        
     }
+    
 
     public void set_angle(double new_angle) {
         if (new_angle>2*Math.PI){
@@ -68,7 +90,6 @@ public class animal {
 
     public void set_position(CartesianCoordinate new_position) {
         position = new_position;
-        update_segments();
     }
 
     public CartesianCoordinate get_position() {
@@ -82,24 +103,9 @@ public class animal {
         local_centre = COM;
     }
     
-    protected void Set_RGBA(){ //Override to set custom colour to sub-class
-        segments[1].set_rgba(0, 0, 0, 200);
-        segments[0].set_rgba(0,0,0,200);
-        segments[2].set_rgba(0,0,0,200);
+    public BufferedImage get_image(){
+     return image;
     }
-    
-    public void update_segments(){
-        CartesianCoordinate pointA,pointB;
-        double TempAngle = angle;
-        int i=0;
-        while (i<3){
-                    pointA=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle-(Math.PI/2)))*10),(position.getY() + (Math.cos(TempAngle-(Math.PI/2)))*10));
-                    pointB=new CartesianCoordinate((position.getX() + (Math.sin(TempAngle-(Math.PI/2)+((2*Math.PI)/3)))*10),(position.getY() + (Math.cos(TempAngle-(Math.PI/2)+((2*Math.PI)/3)))*10));
-                    TempAngle=(TempAngle +((2*Math.PI)/3));
-                    segments[i] = new LineSegment(pointA, pointB);
-                    i++;
-                }
-        Set_RGBA();
-    }
+
 
 }
