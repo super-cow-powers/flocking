@@ -8,6 +8,7 @@ package scene;
 import animals.*;
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,9 +23,10 @@ public class flock implements scene_object {
     //private flockingBird flock_members[];
     private List<flockingBird> flock_members = new ArrayList<>();
     private float radius = 50;
+    private ArrayList<obstacle>obstacles;
 
-    flock(int size, double cohesion, double alignment, double separation) {
-
+    flock(int size, double cohesion, double alignment, double separation, ArrayList<obstacle>Obstacles) {
+        obstacles = Obstacles;
         int j = 0,i = 0;
         while (j < size) {
             for (int k = 0; k < (int)(25 * ((double)size / 4)); k += 25) {
@@ -45,6 +47,10 @@ public class flock implements scene_object {
             //canvas.draw_triangle(flock_member.get_position(), 10, flock_member.get_angle(), Color.blue, Color.black, Color.blue); //Slower
             //canvas.drawLineSegments(flock_member.get_segments());
             canvas.drawBird(flock_member);
+            canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
+            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
+            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
+            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Actual_Position(), Color.green);
         }
     }
 
@@ -81,7 +87,7 @@ public class flock implements scene_object {
     private void update_members(int number, double canvas_X, double canvas_Y, Canvas canvas) {
         
         for (int i = (((number - 1) * flock_members.size()) / 3); i < (int) ((number * flock_members.size()) / 3); i++) {
-            flock_members.get(i).navigate(flock_members, canvas_X, canvas_Y);
+            flock_members.get(i).navigate(flock_members, canvas_X, canvas_Y, obstacles);
         }
     }
 
@@ -92,7 +98,7 @@ public class flock implements scene_object {
 
         /*Threaded version. 
         Kind of trashy, but has no need to be anything other really - as it's the most simple way
-        to implement what I want.
+        to implement what I want. Still Pegs my G5 though.
          */
         Thread t, t1, t2; //Create 3 calculation threads to split the large task
         t = new Thread(new Runnable() { // Create an anonymous inner class that implements Runnable interface
@@ -135,6 +141,16 @@ public class flock implements scene_object {
 
         }
          */
+    }
+
+    @Override
+    public CartesianCoordinate get_location() {
+        throw new UnsupportedOperationException("Not supported for this object."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public double get_size() {
+        return flock_members.size();
     }
 
 }

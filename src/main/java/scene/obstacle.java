@@ -14,26 +14,25 @@ import java.awt.Color;
  *
  * @author david
  */
-public final class obstacle implements scene_object{
+public final class obstacle implements scene_object {
 
-    private CartesianCoordinate centre;
-    private int radius;
+    private final CartesianCoordinate centre;
+    private final int radius;
     private LineSegment segments[];
-
 
     public obstacle(CartesianCoordinate centre_loc, int size, int complexity) {
         centre = centre_loc;
         radius = size;
-            }
+    }
 
     public int get_radius() {
         return radius;
     }
-
+    
+    @Override
     public CartesianCoordinate get_location() {
         return centre;
     }
-    
 
     @Override
     public void draw(Canvas canvas) {
@@ -43,5 +42,10 @@ public final class obstacle implements scene_object{
     @Override
     public void update(Canvas canvas) {
         //Not applicable to this (static) object
+    }
+
+    @Override
+    public double get_size() {
+        return radius;
     }
 }

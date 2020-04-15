@@ -82,20 +82,20 @@ public class Canvas extends JPanel {
         // lines
         g2.setStroke(new BasicStroke(3));
 
+        synchronized (birds) {
+            for (animals.animal bird : birds) {
+                AffineTransform old = g2.getTransform();
+                g.translate((int)bird.get_position().getX(), (int)bird.get_position().getY());
+                g2.rotate(bird.get_direction_angle()+Math.PI/2);
+                g2.drawImage(bird.get_image(), -10, -2, null);
+                g2.setTransform(old);
+            }
+        }
         synchronized (lines) {
             for (LineSegment line : lines) {
                 g2.setColor(line.get_colour());
                 g2.draw(new Line2D.Double(line.getStartPoint().getX(), line.getStartPoint().getY(),
                         line.getEndPoint().getX(), line.getEndPoint().getY()));
-            }
-        }
-        synchronized (birds) {
-            for (animals.animal bird : birds) {
-                AffineTransform old = g2.getTransform();
-                g.translate((int)bird.get_position().getX(), (int)bird.get_position().getY());
-                g2.rotate(bird.get_angle()+Math.PI/2);
-                g2.drawImage(bird.get_image(), 0, 0, null);
-                g2.setTransform(old);
             }
         }
     }

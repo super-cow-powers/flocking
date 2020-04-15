@@ -36,7 +36,11 @@ public class CartesianCoordinate {
     }
     
     public static double angle_between(CartesianCoordinate Centre, CartesianCoordinate Point){
-        return Math.atan2(Point.getY() - Centre.getY(), Point.getX() - Centre.getX());
+        return Math.atan2(Point.getY() - Centre.getY(), Point.getX() - Centre.getX() );
         //return Math.atan2(B.getY(), B.getX()) - Math.atan2(A.getY(), A.getX());
+    }
+    
+    public static CartesianCoordinate mult(CartesianCoordinate input, double factor){
+        return new CartesianCoordinate(input.getX()*factor, input.getY()*factor);
     }
 }

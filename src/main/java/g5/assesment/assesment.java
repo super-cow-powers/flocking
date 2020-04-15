@@ -26,7 +26,6 @@ public class assesment {
     private scene active_scene;
     private double updates_s = 60;
 
-
     private void setup_scene(CartesianCoordinate obstacle_location, int obstacle_radius, int flock_size) {
         active_scene = new scene(obstacle_location, obstacle_radius, (int) (obstacle_radius * 1.5), flock_size);
 
@@ -36,11 +35,8 @@ public class assesment {
     }
 
     private void update() {
-        /*        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(assesment.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+
+        
         ActionListener animate = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -56,10 +52,9 @@ public class assesment {
     public static void main(String[] args) throws InterruptedException { //If either thread is interrupted - terminate.
         CartesianCoordinate obstacle_location = new CartesianCoordinate(350, 250);
         assesment assesmentMain = new assesment();
-        assesmentMain.setup_scene(obstacle_location, 75, 10);
+        assesmentMain.setup_scene(obstacle_location, 75, 30);
         System.out.println("g5.assesment.assesment.main()");
         assesmentMain.update();
-        
 
     }
 }

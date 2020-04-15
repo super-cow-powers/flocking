@@ -6,12 +6,12 @@
 package animals;
 
 import geometry.CartesianCoordinate;
-import geometry.LineSegment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
+import scene.obstacle;
 
 /**
  *
@@ -27,24 +27,27 @@ public final class flockingBird extends animal {
 
     List<flockingBird> animals_in_range;
 
-    /* Separation of bird. It is between 1 and 0, 1 being full separation */
     public flockingBird(double xLoc, double yLoc, double newcohesion, double newalignment, double newseparation) {
         name = "flocking bird";
         int temp_speed = 0;
-        while (temp_speed < 5) {
-            temp_speed = r.nextInt(100);
+        while (temp_speed < 50) {
+            temp_speed = r.nextInt(200);
         }
         speed = temp_speed;
-        angle = 0; //-Math.PI/2; //Default face upwards
-        angular_velocity = 0;
+        target_angle = 0;
+        direction_angle = 0;
+        angular_velocity = 8;
         position = new CartesianCoordinate(xLoc, yLoc);
-        view_angle = Math.PI;
         view_radius = 100;
-        try{
-        image = ImageIO.read(new File("flock.png"));
-        }catch(IOException e){e.printStackTrace();}
-        catch(Exception e){e.printStackTrace();
-        }        
+        local_centre = new CartesianCoordinate(xLoc, yLoc);
+        bouncing = 0;
+        try {
+            image = ImageIO.read(new File("flock.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         set_cohesion(newcohesion);
         set_alignment(newalignment);
         set_separation(newseparation);
@@ -74,93 +77,110 @@ public final class flockingBird extends animal {
         }
     }
 
-    private void wrap(double canvas_X, double canvas_Y) {
-        //Code to wrap animal to other side of window
-        if (position.getX() > canvas_X) {
-            set_position(new CartesianCoordinate(0, position.getY()));
-        } else if (position.getX() < 0) {
-            set_position(new CartesianCoordinate(canvas_X, position.getY()));
-        }
-        if (position.getY() > canvas_Y) {
-            set_position(new CartesianCoordinate(position.getX(), 0));
-        } else if (position.getY() < 0) {
-            set_position(new CartesianCoordinate(position.getX(), canvas_Y));
-        }
-    }
 
     private void line_of_sight(List<flockingBird> flock) {
         animals_in_range = new ArrayList<>();
         for (flockingBird bird : flock) {
-            
-            if (bird != this) {
+
+            if (true) {
                 double distance = CartesianCoordinate.dist_between(position, bird.get_position());
-                if (distance <= 0 || distance > view_radius) {
+                if (distance > view_radius) {
                     continue;
                 }
-                double angle_between = CartesianCoordinate.angle_between(bird.get_position(), this.position);
-                System.out.printf("between: %f facing %f \n", angle_between, angle);
-                if (angle_between > ((view_angle / 2) - angle) || angle_between < ((view_angle / 2) + angle)) {
-                    animals_in_range.add(bird);
+                animals_in_range.add(bird);
+                //}
+            }
+        }
+    }
+
+    private double avoid(double AverageX, double AverageY) {
+        double ret_ang = ((((CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY)))) - Math.PI)) * separation;
+        return ret_ang;
+    }
+
+    private double cohesion(double AverageX, double AverageY) {
+        double ret_ang = ((CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY))) * cohesion);
+
+        return ret_ang;
+    }
+
+    private double alignment(double average_angle) {
+        double ret_ang = (average_angle) * alignment;
+
+        return ret_ang;
+    }
+
+    private void seek_angle() {
+        /*
+        double rad_dist = angular_velocity / 60, temp_angleA = direction_angle, temp_angleB;
+        int count, sign = 1;
+        int[] radial_count = new int[2];
+        System.out.printf("Percent %f\n", direction_angle/target_angle);
+        if (direction_angle/target_angle < 0.9 | direction_angle/target_angle > 1.1 | target_angle == 0) {
+           //System.out.printf("Seeking\n");
+            for (int i = 0; i < 2; i++) {
+                temp_angleA = direction_angle; 
+                count = 0;
+                while (count <= 360) {
+                    temp_angleB = temp_angleA;
+                    temp_angleA += sign * 0.2;
+                    if (temp_angleA > Math.PI) {
+                        temp_angleA = temp_angleA - (2 * Math.PI);
+                    } else if (temp_angleA < -Math.PI) {
+                        temp_angleA = temp_angleA + (2 * Math.PI);
+                    }
+                    if ((temp_angleA > target_angle && temp_angleB < target_angle) | (temp_angleA < target_angle && temp_angleB > target_angle)) {
+                        radial_count[i] = count;
+                        count = 361;
+                        
+                    }
+                    count++;
                 }
+                sign = sign * (-1);
             }
-        }
+            System.out.printf("Seekd %d %d\n", radial_count[0], radial_count[1]);
+            sign = (radial_count[0] > radial_count[1]) ? -1 : 1;
+            System.out.printf("Sign: %d\n",sign);
+            temp_angleA = direction_angle + (rad_dist * sign);
+            if (temp_angleA > Math.PI) {
+                temp_angleA -= Math.PI * 2;
+            } else if (temp_angleA < -Math.PI) {
+                temp_angleA += Math.PI * 2;
+            }
+
+        }*/
+        set_direction_angle(target_angle);
+        set_position(Get_Actual_Position());
     }
 
-    private double avoid() {
-        double desiredSeparation = 25;
-        double newAngle = 0;
-        int count = 0;
-        for (flockingBird bird : animals_in_range) {
-
-            double distance = CartesianCoordinate.dist_between(position, bird.get_position());
-            if ((distance > 0) && (distance < desiredSeparation)) {
-                newAngle += CartesianCoordinate.angle_between(position, bird.get_position()) / distance;
-                count++;
-            }
-        }
-        if (count > 0) {
-            newAngle /= count;
-            return newAngle;
-        } else {
-            return 0;
-        }
-
-    }
-
-    public void navigate(List<flockingBird> flock, double canvas_X, double canvas_Y) {
-        /*wrap(canvas_X, canvas_Y);
+    public void navigate(List<flockingBird> flock, double canvas_X, double canvas_Y, List<obstacle> obstacles) {
+        wrap(canvas_X, canvas_Y);
         line_of_sight(flock);
         double averageX = 0;
         double averageY = 0;
         double averageAng = 0;
-        double newAng;
         for (flockingBird bird : animals_in_range) {
-
             averageX += bird.get_position().getX();
             averageY += bird.get_position().getY();
-            averageAng += bird.get_angle();
-            //System.out.printf("X Y: (%f,%f)\n", flock_members[j].get_position().getX(),flock_members[j].get_position().getY());
-
-            //System.out.printf("AVG: (%f,%f)\n", averageX,averageY);
-            averageX = averageX / (animals_in_range.size());
-            averageY = averageY / (animals_in_range.size());
-            averageAng = averageAng / (animals_in_range.size());
-            set_local_COM(new CartesianCoordinate(averageX, averageY));
-            //newAng = Math.atan2(averageY - member.get_position().getY(), member.get_position().getX() - averageX) * member.cohesion();
-            newAng = CartesianCoordinate.angle_between(position, new CartesianCoordinate(averageX, averageY)) * cohesion;
-            newAng = newAng + ((averageAng - newAng) * alignment); //Sum of centre of mass angle, and average angle*alignment factor.
-            //System.out.printf("newangle %f \n", newAng);
-            set_angle(newAng + avoid()); //If alignment == 1, then the angle here will equal the average angle.
-
+            averageAng += bird.get_target_angle();
         }
-        CartesianCoordinate new_pos = Get_New_Position();
-        set_position(new_pos);*/
-        set_angle(angle+0.01);
-        CartesianCoordinate new_pos = Get_New_Position();
-        set_position(new_pos);
+
+        averageX = averageX / (animals_in_range.size());
+        averageY = averageY / (animals_in_range.size());
+        averageAng = averageAng / (animals_in_range.size());
+        set_local_COM(new CartesianCoordinate(averageX, averageY));
+        if (!bounce(obstacles)) {
+            set_target_angle(cohesion(averageX, averageY) + alignment(averageAng) + avoid(averageX, averageY));
+            //set_target_angle(cohesion(averageX, averageY));
+            seek_angle();
+            //set_direction_angle(target_angle);
+            //CartesianCoordinate new_pos = Get_Actual_Position();
+            //set_position(new_pos);
+            //System.out.printf("Cohesion angle %f Dir angle %f\n", cohesion(averageX, averageY), direction_angle);
+        }
     }
 
-    public double cohesion() {
+    public double get_cohesion() {
         return cohesion;
     }
 
@@ -176,7 +196,7 @@ public final class flockingBird extends animal {
         }
     }
 
-    public double alignment() {
+    public double get_alignment() {
         return alignment;
     }
 

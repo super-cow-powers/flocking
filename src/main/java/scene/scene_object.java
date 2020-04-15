@@ -4,6 +4,7 @@
 package scene;
 
 import drawing.Canvas;
+import geometry.CartesianCoordinate;
 
 /**
  *
@@ -15,4 +16,6 @@ import drawing.Canvas;
 public interface scene_object {
     public void draw(Canvas canvas);
     public void update(Canvas canvas);
+    public CartesianCoordinate get_location();
+    public double get_size();
 }
