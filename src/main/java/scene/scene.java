@@ -7,10 +7,18 @@ package scene;
 
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.border.EtchedBorder;
 
 /**
  *
@@ -23,11 +31,12 @@ public class scene{
     private ArrayList<scene_object> scene_objects;
     private JFrame frame;
     private Canvas canvas;
-    private final int WINDOW_X_SIZE = 800;
-    private final int WINDOW_Y_SIZE = 600;
-    private final double default_cohesion=0.2;
-    private final double default_alignment=0.3;
-    private final double default_separation=0.4;
+    private final int WINDOW_X_SIZE = 1024; /* Set the JFrame to a standard resolution. */
+    private final int WINDOW_Y_SIZE = 768; /* XGA is used, as it will fit easily into anything recent
+                                            * without being too small */
+    private final double default_cohesion=0.4;
+    private final double default_alignment=0.5;
+    private final double default_separation=0.3;
     
     public scene(CartesianCoordinate obstacle_loc, int obstacle_radius, int obstacle_complexity, int flock_num) {
             Obstacles = new ArrayList<obstacle>();
@@ -45,15 +54,27 @@ public class scene{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setResizable(false);
+        frame.setLayout(new BorderLayout());
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
         });
+        JPanel PanelB = new JPanel();
+        PanelB.add(new JButton("Reset"));
+        JPanel Panel = new JPanel();
+        Panel.add(new JButton("Reset"));
+        Panel.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.black));
+        PanelB.setBorder(BorderFactory.createMatteBorder(5, 5, 0, 5, Color.black));
+        JPanel HackyMcHackface_panel = new JPanel(new FlowLayout());
         canvas = new Canvas(frame);
-        frame.getContentPane().add(canvas);
-        JFrame.setDefaultLookAndFeelDecorated(true);
+        canvas.setBorder(BorderFactory.createLineBorder(Color.black));
+        HackyMcHackface_panel.add(canvas); /* Stops the BorderLayout resizing my canvas, as BorderLayout does not respect preferred size but FlowLayout does */
+        frame.add(HackyMcHackface_panel, BorderLayout.WEST);
+        frame.add(PanelB, BorderLayout.EAST);
+        frame.add(Panel, BorderLayout.SOUTH);
+        frame.validate();
         scene_objects.addAll(Obstacles);
         scene_objects.addAll(bird_flocks);
         redraw_scene();

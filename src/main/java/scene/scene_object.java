@@ -8,7 +8,7 @@ import geometry.CartesianCoordinate;
 
 /**
  *
- * @author david
+ * @author REDACTED
  * defines an interface for the objects being drawn to the scene
  * draw will draw the objects,
  * update will update their current state.

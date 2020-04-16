@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import geometry.CartesianCoordinate;
 import geometry.LineSegment;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import javax.swing.JFrame;
 
@@ -62,8 +63,12 @@ public class Canvas extends JPanel {
         lines = Collections.synchronizedList(new ArrayList<LineSegment>());
         birds = Collections.synchronizedList(new ArrayList<animals.animal>());
     }
-
+    
     private void setupCanvas() {
+        //setSize(xSize, ySize);
+        setPreferredSize(new Dimension(xSize, ySize));
+        setMaximumSize(new Dimension(xSize, ySize));
+        setMinimumSize(new Dimension(xSize, ySize));
         setSize(xSize, ySize);
         setVisible(true);
         repaint();

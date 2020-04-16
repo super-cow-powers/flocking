@@ -47,10 +47,10 @@ public class flock implements scene_object {
             //canvas.draw_triangle(flock_member.get_position(), 10, flock_member.get_angle(), Color.blue, Color.black, Color.blue); //Slower
             //canvas.drawLineSegments(flock_member.get_segments());
             canvas.drawBird(flock_member);
-            canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
+            /*canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
             canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
             canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
-            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Actual_Position(), Color.green);
+            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Actual_Position(), Color.green);*/
         }
     }
 

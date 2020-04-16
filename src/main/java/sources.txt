@@ -1,0 +1,10 @@
+./drawing/Canvas.java
+./geometry/CartesianCoordinate.java
+./geometry/LineSegment.java
+./scene/scene.java
+./scene/obstacle.java
+./scene/flock.java
+./scene/scene_object.java
+./animals/animal.java
+./animals/flockingBird.java
+./assesment/assesment.java

@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.swing.ImageIcon;
 import scene.obstacle;
 import scene.scene_object;
@@ -21,7 +22,6 @@ import scene.scene_object;
  */
 public class animal {
 
-    static final Random r = new Random();
     double speed;/* In px/s */
     double target_angle;
     /* in rads */
@@ -34,6 +34,7 @@ public class animal {
     String name;
     CartesianCoordinate local_centre;
     int bouncing;
+    int seeking;
 
     //String type;
     public animal() {
@@ -48,7 +49,7 @@ public class animal {
         return length;
     }
 
-    public CartesianCoordinate Get_Actual_Position() {
+    public CartesianCoordinate Get_Direction_Position() {
         double distance = speed / 60;
         return new CartesianCoordinate(position.getX() + (Math.cos((direction_angle)) * distance) + 0.5, position.getY() + (Math.sin((direction_angle)) * distance));
 
@@ -131,15 +132,19 @@ public class animal {
 
     protected boolean bounce(List<obstacle> obstacles) {
         //Code to bounce animal away from obstacle
-        for (scene_object obstacle : obstacles) {
-            if (this.get_distance(obstacle.get_location()) <= obstacle.get_size()) {
+        if (bouncing == 0) {
+            for (scene_object obstacle : obstacles) {
+                if (this.get_distance(obstacle.get_location()) <= obstacle.get_size() + 10) {
+                    set_target_angle(target_angle + Math.PI);
+                    bouncing = 30;
+                }
             }
         }
 
         if (bouncing != 0) {
             bouncing--;
             set_direction_angle(target_angle);
-            set_position(Get_Actual_Position());
+            set_position(Get_Direction_Position());
             return true;
         } else {
             return false;
