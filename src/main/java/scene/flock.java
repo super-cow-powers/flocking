@@ -78,6 +78,11 @@ public class flock implements scene_object {
             bird.set_separation(separation);
         }
     }
+    public void set_viewRadius(int new_Radius) {
+        for (flockingBird bird : flock_members) {
+            bird.set_viewRadius(new_Radius);
+        }
+    }
 
     //@Override
     public void update_st(Canvas canvas) {

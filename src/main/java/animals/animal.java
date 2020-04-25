@@ -64,8 +64,12 @@ public class animal {
                                                 */
         speed = Math.abs(new_speed);
     }
+    
+    public void set_viewRadius(int new_radius){
+        view_radius = new_radius;
+    }
 
-    public void set_target_angle(double new_angle) { /* Set the target angle, and account for the discontinuity and range */
+    protected void set_target_angle(double new_angle) { /* Set the target angle, and account for the discontinuity and range */
         if (new_angle < -Math.PI) {
             new_angle += Math.PI * 2;
         } else if (new_angle > Math.PI) {

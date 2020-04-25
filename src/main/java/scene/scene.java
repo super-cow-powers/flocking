@@ -57,6 +57,8 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
     private double cohesion = default_cohesion;
     private double alignment = default_alignment;
     private double separation = default_separation;
+    private final int viewRadiusDEF = 100;
+    private int viewRadius = viewRadiusDEF;
     private Timer timer;
     private boolean paused = false;
     private boolean debug = false;
@@ -177,7 +179,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.add(alignmentSlider);
         
         JSlider viewJSlider = new JSlider(JSlider.HORIZONTAL,
-                20, 100, 70);
+                20, 100, viewRadiusDEF);
         viewJSlider.setMajorTickSpacing(20);
         viewJSlider.setMinorTickSpacing(1);
         viewJSlider.setPaintTicks(true);
@@ -215,13 +217,14 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         timer.start(); //Start animation
     }
 
-    private void set_Flock_parameters(double newCohesion, double newAlignment, double newSeparation) {
+    private void set_Flock_parameters(double newCohesion, double newAlignment, double newSeparation, int newRadius) {
         for (scene_object obj : scene_objects) {
             if (obj.get_class().equals("scene.flock")) {
                 flock flk = (flock) obj;
                 flk.set_cohesion(newCohesion);
                 flk.set_alignment(newAlignment);
                 flk.set_separation(newSeparation);
+                flk.set_viewRadius(newRadius);
             }
         }
     }
@@ -270,20 +273,23 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
             }
         } else if ("cohesion".equals(source.getName())) {
             cohesion = (double)source.getValue()/10;
-            set_Flock_parameters(cohesion, alignment, separation);
+            set_Flock_parameters(cohesion, alignment, separation, viewRadius);
         } else if ("separation".equals(source.getName())) {
             separation = (double)source.getValue()/10;
-            set_Flock_parameters(cohesion, alignment, separation);
+            set_Flock_parameters(cohesion, alignment, separation, viewRadius);
         } else if ("alignment".equals(source.getName())) {
             alignment = (double)source.getValue()/10;
-            set_Flock_parameters(cohesion, alignment, separation);
+            set_Flock_parameters(cohesion, alignment, separation, viewRadius);
+        } else if ("view".equals(source.getName())) {
+            viewRadius = source.getValue();
+            set_Flock_parameters(cohesion, alignment, separation, viewRadius);
         }
     }
-
+/*
     private reset_defaults(){
         
     }
-    
+    */
     /*
     This method must be called to draw, usually after an update.
     It is likely NOT thread safe! 
