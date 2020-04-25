@@ -16,20 +16,19 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public class flock implements scene_object {
 
     //private flockingBird flock_members[];
     private List<flockingBird> flock_members = new ArrayList<>();
-    private float radius = 50;
-    private ArrayList<obstacle>obstacles;
+    private ArrayList<obstacle> obstacles;
 
-    flock(int size, double cohesion, double alignment, double separation, ArrayList<obstacle>Obstacles) {
+    flock(int size, double cohesion, double alignment, double separation, ArrayList<obstacle> Obstacles) {
         obstacles = Obstacles;
-        int j = 0,i = 0;
+        int j = 0, i = 0;
         while (j < size) {
-            for (int k = 0; k < (int)(25 * ((double)size / 4)); k += 25) {
+            for (int k = 0; k < (int) (25 * ((double) size / 4)); k += 25) {
                 //System.out.printf("%d %d\n", size, j);
                 flock_members.add(new flockingBird(10 + k, 10 + i, cohesion, alignment, separation));
                 j++;
@@ -42,15 +41,17 @@ public class flock implements scene_object {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, boolean debug) {
         for (animal flock_member : flock_members) {
             //canvas.draw_triangle(flock_member.get_position(), 10, flock_member.get_angle(), Color.blue, Color.black, Color.blue); //Slower
             //canvas.drawLineSegments(flock_member.get_segments());
             canvas.drawBird(flock_member);
-            /*canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
-            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
-            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
-            canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Actual_Position(), Color.green);*/
+            if (debug == true) {
+                canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
+                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
+                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
+                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Direction_Position(), Color.green);
+            }
         }
     }
 
@@ -71,6 +72,12 @@ public class flock implements scene_object {
             bird.set_alignment(ammount);
         }
     }
+    
+    public void set_separation(double separation) {
+        for (flockingBird bird : flock_members) {
+            bird.set_separation(separation);
+        }
+    }
 
     //@Override
     public void update_st(Canvas canvas) {
@@ -85,7 +92,7 @@ public class flock implements scene_object {
     }
 
     private void update_members(int number, double canvas_X, double canvas_Y, Canvas canvas) {
-        
+
         for (int i = (((number - 1) * flock_members.size()) / 3); i < (int) ((number * flock_members.size()) / 3); i++) {
             flock_members.get(i).navigate(flock_members, canvas_X, canvas_Y, obstacles);
         }
@@ -151,6 +158,11 @@ public class flock implements scene_object {
     @Override
     public double get_size() {
         return flock_members.size();
+    }
+
+    @Override
+    public String get_class() {
+        return this.getClass().getName();
     }
 
 }

@@ -12,7 +12,7 @@ import java.awt.Color;
 
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public final class obstacle implements scene_object {
 
@@ -35,7 +35,7 @@ public final class obstacle implements scene_object {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, boolean debug) {
         canvas.draw_circle(centre, radius, 100, 0, Color.red);
     }
 
@@ -47,5 +47,10 @@ public final class obstacle implements scene_object {
     @Override
     public double get_size() {
         return radius;
+    }
+
+    @Override
+    public String get_class() {
+        return this.getClass().getName();
     }
 }

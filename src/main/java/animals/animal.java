@@ -6,32 +6,23 @@
 package animals;
 
 import geometry.CartesianCoordinate;
-import geometry.LineSegment;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import javax.swing.ImageIcon;
 import scene.obstacle;
 import scene.scene_object;
 
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public class animal {
 
     double speed;/* In px/s */
-    double target_angle;
-    /* in rads */
-    double view_radius;
-    /* In px */
-    double angular_velocity;
+    double target_angle; /* in rads */
+    double view_radius; /* In px */
     double direction_angle;
     BufferedImage image;
     CartesianCoordinate position;
-    String name;
     CartesianCoordinate local_centre;
     int bouncing;
     int seeking;
@@ -45,93 +36,78 @@ public class animal {
      */
     public double get_distance(CartesianCoordinate point_to) {
         double length;
-        length = position.distance_to(point_to);
+        length = CartesianCoordinate.dist_between(position, point_to);
         return length;
     }
 
-    public CartesianCoordinate Get_Direction_Position() {
-        double distance = speed / 60;
+    public CartesianCoordinate Get_Direction_Position() { /* returns the position that the bird will be in if the direction (actual) angle is followed */
+        double distance = speed / 60; /* The simulation speed has a multiplier of 1 at 60 updates/second - so speed*1 (px/s) is dist/(1/60) */
         return new CartesianCoordinate(position.getX() + (Math.cos((direction_angle)) * distance) + 0.5, position.getY() + (Math.sin((direction_angle)) * distance));
-
-        //System.out.printf("New Pos (%f,%f) delX %f delY %f angle %f dist %f\n", position.getX(),position.getY(),Math.cos(angle)*distance, Math.sin(angle)*distance, angle, distance);
     }
 
-    public CartesianCoordinate Get_Target_Position() {
+    public CartesianCoordinate Get_Target_Position() { /* returns the position that the bird will be in if the target angle is followed */
         double distance = speed / 60;
         return new CartesianCoordinate(position.getX() + (Math.cos((target_angle)) * distance) + 0.5, position.getY() + (Math.sin((target_angle)) * distance));
-        //System.out.printf("New Pos (%f,%f) delX %f delY %f angle %f dist %f\n", position.getX(),position.getY(),Math.cos(angle)*distance, Math.sin(angle)*distance, angle, distance);
     }
 
     public double get_target_angle() {
         return target_angle;
     }
-
-    public double get_angular_velocity() {
-        return angular_velocity;
-    }
-
+    
     public double get_speed() {
         return speed;
     }
 
-    public void set_speed(double new_speed) { //Always positive
+    public void set_speed(double new_speed) { /** sets the bird's speed. Kind of redundant since I'm setting a random speed in the constructor
+                                                * but I'm going to keep it in-case I want to over-ride the random speed from the UI or something.
+                                                * But it's unlikely.
+                                                */
         speed = Math.abs(new_speed);
     }
 
-    public void set_target_angle(double new_angle) {
+    public void set_target_angle(double new_angle) { /* Set the target angle, and account for the discontinuity and range */
         if (new_angle < -Math.PI) {
             new_angle += Math.PI * 2;
         } else if (new_angle > Math.PI) {
             new_angle -= Math.PI * 2;
         }
-
         target_angle = new_angle;
-
-        //System.out.printf("angle %f\n", angle);
     }
 
     public double get_direction_angle() {
         return direction_angle;
     }
 
-    protected void set_direction_angle(double new_angle) {
-        if (new_angle < -Math.PI) {
-            new_angle += Math.PI * 2;
+    protected void set_direction_angle(double new_angle) { /* Set the direction angle, and account for the discontinuity and range.   */
+        if (new_angle < -Math.PI) {                        /* Only the object itself should be allowed to decide its actual direction.*/
+            new_angle += Math.PI * 2;                      /* Whereas I want to stay open to suggestions as for the target angle      */
         } else if (new_angle > Math.PI) {
             new_angle -= Math.PI * 2;
         }
-
         direction_angle = new_angle;
-
-        //System.out.printf("angle %f\n", angle);
     }
 
-    public void set_angular_velocity(double angular_vel) {
-        angular_velocity = angular_vel;
-    }
-
-    protected void set_position(CartesianCoordinate new_position) {
+    protected void set_position(CartesianCoordinate new_position) { /* Only the object itself should be allowed to decide its position outside the constructor.*/
         position = new_position;
     }
 
-    public CartesianCoordinate get_position() {
+    public CartesianCoordinate get_position() { /* Though the location doesn't have to be kept hidden */
         return position;
     }
 
-    public CartesianCoordinate get_local_COM() {
-        return local_centre;
+    public CartesianCoordinate get_local_COM() { /* Same with the object's Local Centre Of Mass - */
+        return local_centre;                     /* If I don't know where it is, I can't draw it  */
     }
 
-    protected void set_local_COM(CartesianCoordinate COM) {
+    protected void set_local_COM(CartesianCoordinate COM) { /* But I can't have any old riffraff setting the position */
         local_centre = COM;
     }
 
-    public BufferedImage get_image() {
+    public BufferedImage get_image() { /* I need to know what it looks like, don't I? (well, the canvas does) */
         return image;
     }
 
-    protected boolean bounce(List<obstacle> obstacles) {
-        //Code to bounce animal away from obstacle
+    protected boolean bounce(List<obstacle> obstacles) { /* This provides a standard bounce if the user does not wish to override */
         if (bouncing == 0) {
             for (scene_object obstacle : obstacles) {
                 if (this.get_distance(obstacle.get_location()) <= obstacle.get_size() + 10) {
@@ -142,6 +118,12 @@ public class animal {
         }
 
         if (bouncing != 0) {
+            for (scene_object obstacle : obstacles) {
+                if (this.get_distance(obstacle.get_location()) < obstacle.get_size()) {
+                    this.set_position(new CartesianCoordinate(10, 10)); /* This shouldn't be triggered, but sometimes a bird will unfortunately get into the obstacle */
+                    bouncing = 0; /* and it's very annoying */
+                }
+            }
             bouncing--;
             set_direction_angle(target_angle);
             set_position(Get_Direction_Position());

@@ -206,6 +206,9 @@ public class Canvas extends JPanel {
         synchronized (lines) {
             lines.clear();
         }
+        synchronized (birds) {
+            birds.clear();
+        }
         repaint();
     }
 }

@@ -8,7 +8,7 @@ import java.awt.Color;
 import java.lang.Math;
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public class LineSegment {
     

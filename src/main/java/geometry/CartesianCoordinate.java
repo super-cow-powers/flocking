@@ -7,7 +7,7 @@ package geometry;
 
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public class CartesianCoordinate {
 

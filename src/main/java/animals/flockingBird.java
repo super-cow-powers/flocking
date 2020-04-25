@@ -15,39 +15,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import scene.obstacle;
+import scene.scene_object;
 
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public final class flockingBird extends animal {
-
+/* All the behavoural multipliers have the same range: 0-1 inclusive */
+/* This is enforced. So don't get any ideas.                         */
     double cohesion;
-    /* Cohesion of bird. It is between 1 and 0, 1 being full cohesion */
     double alignment;
-    /* Contains the alignment of the bird */
     double separation;
-
     List<flockingBird> animals_in_range;
 
     public flockingBird(double xLoc, double yLoc, double newcohesion, double newalignment, double newseparation) {
-        name = "flocking bird";
-        speed = ThreadLocalRandom.current().nextInt(50, 200);
+        speed = ThreadLocalRandom.current().nextInt(50, 100); /* Set a random speed in that range. Helps avoid bunching up a bit. Is also thread-safe. */
         target_angle = 0;
         direction_angle = 0;
-        angular_velocity = 8;
         position = new CartesianCoordinate(xLoc, yLoc);
         view_radius = 100;
         local_centre = new CartesianCoordinate(xLoc, yLoc);
         bouncing = 0;
         seeking = 0;
-        try {
-            image = ImageIO.read(new File("flock.png"));
+        try { /* Trys to import the sprite for the bird */
+            image = ImageIO.read(new File("flock.png")); //Netbeans finds it here
         } catch (IOException e) {
             try {
-                image = ImageIO.read(new File("assets/flock.png"));
+                image = ImageIO.read(new File("assets/flock.png")); //java assesment.assesment finds it here
             } catch (IOException ex) {
-                Logger.getLogger(flockingBird.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(flockingBird.class.getName()).log(Level.SEVERE, null, ex); //If you end up here, does the image actually exist?
             }
         }
         set_cohesion(newcohesion);
@@ -55,13 +52,13 @@ public final class flockingBird extends animal {
         set_separation(newseparation);
     }
 
-    public void set_cohesion(double ammount) {
-        if (ammount <= 1) {
+    public void set_cohesion(double ammount) { /* I told you the ranges were enforced, didn't I */
+        if (ammount <= 1) { /* Oh, and these are public so that I can change them without making a new bird */
             cohesion = ammount;
         } else if (ammount > 1) {
             System.out.println("Hey, so your Cohesion should be between 0 and 1, yours is >1. Would you check it please? I've set it to 1 for now.");
             cohesion = 1;
-        } else if (ammount < -1) {
+        } else if (ammount < 0) {
             System.out.println("Hey, so your Cohesion should be between 0 and 1, yours is <0. Would you check it please? I've set it to 0 for now.");
             cohesion = 0;
         }
@@ -73,31 +70,42 @@ public final class flockingBird extends animal {
         } else if (ammount > 1) {
             System.out.println("Hey, so your separation should be between 0 and 1, yours is >1. Would you check it please? I've set it to 1 for now.");
             separation = 1;
-        } else if (ammount < -1) {
+        } else if (ammount < 0) {
             System.out.println("Hey, so your separation should be between 0 and 1, yours is <0. Would you check it please? I've set it to 0 for now.");
             separation = 0;
         }
     }
+    
+        public void set_alignment(double ammount) {
+        if (ammount <= 1) {
+            alignment = ammount;
+        } else if (ammount > 1) {
+            System.out.println("Hey, so your Alignment should be between -1 and 1, yours is >1. Would you check it please? I've set it to 1 for now.");
+            alignment = 1;
+        } else if (ammount < 0) {
+            System.out.println("Hey, so your Alignment should be between 0 and 1, yours is <-1. Would you check it please? I've set it to 0 for now.");
+            alignment = 0;
+        }
+    }
 
-    private void line_of_sight(List<flockingBird> flock) {
+    private void line_of_sight(List<flockingBird> flock) { /* Locates others in range */
         animals_in_range = new ArrayList<>();
         for (flockingBird bird : flock) {
 
-            if (bird != this) {
-                double distance = CartesianCoordinate.dist_between(position, bird.get_position());
+            if (bird != this) { //Are birds self aware?
+                double distance = this.get_distance(bird.get_position());
                 if (distance > view_radius) {
                     continue;
                 }
                 animals_in_range.add(bird);
-                //}
             }
         }
     }
 
-    private double avoid(double AverageX, double AverageY) {
+    private double avoid(double AverageX, double AverageY) { /* Find separation angle */
         double angle = (CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY)));
-        if (angle < 0) {
-            angle += Math.PI;
+        if (angle <= 0) { /* This makes it rotate the right way round the circle */
+            angle += Math.PI; /* Draw it out on paper if you're not sure */
             angle *= separation;
         } else {
             angle -= Math.PI;
@@ -106,8 +114,10 @@ public final class flockingBird extends animal {
         return angle;
     }
 
-    private double cohesion(double AverageX, double AverageY) {
-        double ret_ang = ((CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY))) * cohesion);
+    private double cohesion(double AverageX, double AverageY) { /* Find cohesion angle */
+        double ret_ang = ((CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY))) * cohesion); 
+        /*This business of making new coords for each is perhaps not most efficient, */
+        /*but with a good underlying architecture, it makes naff-all difference      */
 
         return ret_ang;
     }
@@ -118,7 +128,7 @@ public final class flockingBird extends animal {
         return ret_ang;
     }
 
-    private boolean seek() {
+    private void seek() {
         /*
         double rad_dist = angular_velocity / 60, temp_angleA = direction_angle, temp_angleB;
         int count, sign = 1;
@@ -157,31 +167,14 @@ public final class flockingBird extends animal {
             }
 
         }*/
- /*
-        if (seeking < 5) {
-            set_direction_angle(direction_angle + (target_angle / 5));
-            set_position(Get_Direction_Position());
-            seeking++;
-            return true;
-        } else {
-            seeking = 0;
-            return false;
-        }
-         */
-        if (Math.abs(get_direction_angle() - target_angle) > Math.PI) {
-            //set_direction_angle(target_angle/2);
-            set_position(Get_Direction_Position());
-            return true;
-        } else {
-            set_direction_angle(target_angle);
-            set_position(Get_Direction_Position());
-            return true;
-        }
+
+        set_direction_angle(target_angle);
+        set_position(Get_Direction_Position());
     }
 
     public void navigate(List<flockingBird> flock, double canvas_X, double canvas_Y, List<obstacle> obstacles) {
-        wrap(canvas_X, canvas_Y);
         line_of_sight(flock);
+        wrap(canvas_X, canvas_Y);
         double averageX = 0;
         double averageY = 0;
         double averageAng = 0;
@@ -203,8 +196,8 @@ public final class flockingBird extends animal {
                 set_target_angle(cohesion(averageX, averageY) + alignment(averageAng) + avoid(averageX, averageY));
                 seek();
             }
-        } else {
-            set_position(Get_Direction_Position());
+        } else if (!bounce(obstacles)) {
+            seek();
         }
     }
 
@@ -212,20 +205,40 @@ public final class flockingBird extends animal {
         return cohesion;
     }
 
-    public void set_alignment(double ammount) {
-        if (ammount <= 1) {
-            alignment = ammount;
-        } else if (ammount > 1) {
-            System.out.println("Hey, so your Alignment should be between -1 and 1, yours is >1. Would you check it please? I've set it to 1 for now.");
-            alignment = 1;
-        } else if (ammount < 0) {
-            System.out.println("Hey, so your Alignment should be between 0 and 1, yours is <-1. Would you check it please? I've set it to 0 for now.");
-            alignment = 0;
-        }
-    }
-
     public double get_alignment() {
         return alignment;
     }
 
+    @Override
+    protected boolean bounce(List<obstacle> obstacles) {
+        //Code to bounce animal away from obstacle
+        if (bouncing == 0) {
+            for (scene_object obstacle : obstacles) {
+                if (this.get_distance(obstacle.get_location()) <= obstacle.get_size() + 10) {
+                    set_target_angle(target_angle + Math.PI);
+                    bouncing = 30;
+                }
+            }
+        }
+
+        if (bouncing != 0) {
+            for (scene_object obstacle : obstacles) {
+                if (this.get_distance(obstacle.get_location()) < obstacle.get_size()) {
+                    target_angle = 0; //Reset the bird if required
+                    direction_angle = 0;
+                    position = new CartesianCoordinate(ThreadLocalRandom.current().nextInt(20, 50), ThreadLocalRandom.current().nextInt(20, 50));
+                    view_radius = 100;
+                    local_centre = new CartesianCoordinate(ThreadLocalRandom.current().nextInt(20, 50), ThreadLocalRandom.current().nextInt(20, 50));
+                    bouncing = 0;
+                    seeking = 0;
+                }
+            }
+            bouncing--;
+            set_direction_angle(target_angle);
+            set_position(Get_Direction_Position());
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

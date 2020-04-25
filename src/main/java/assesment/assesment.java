@@ -16,7 +16,7 @@ import scene.scene;
 
 /**
  *
- * @author david
+ * @author REDACTED
  */
 public class assesment {
 
@@ -24,37 +24,18 @@ public class assesment {
      * @param args the command line arguments
      */
     private scene active_scene;
-    private double updates_s = 60;
 
-    private void setup_scene(CartesianCoordinate obstacle_location, int obstacle_radius, int flock_size) {
-        active_scene = new scene(obstacle_location, obstacle_radius, (int) (obstacle_radius * 1.5), flock_size);
-
-        //active_scene = new scene(obstacle_location,obstacle_radius,3,flock_size);
-        //draw flock
-        //return scene
-    }
-
-    private void update() {
-
-        
-        ActionListener animate = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-               active_scene.update_scene();
-               active_scene.redraw_scene();
-            }
-        };
-        Timer timer = new Timer((int)(1/updates_s) ,animate);
-        timer.setRepeats(true);
-        timer.start();
+    private void setup_scene(CartesianCoordinate obstacle_location, int obstacle_radius) {
+        active_scene = new scene(obstacle_location, obstacle_radius, (int) (obstacle_radius * 1.5));
     }
 
     public static void main(String[] args) throws InterruptedException { //If either thread is interrupted - terminate.
         CartesianCoordinate obstacle_location = new CartesianCoordinate(350, 250);
         assesment assesmentMain = new assesment();
-        assesmentMain.setup_scene(obstacle_location, 75, 30);
+        assesmentMain.setup_scene(obstacle_location, 75);
         System.out.println("g5.assesment.assesment.main()");
-        assesmentMain.update();
 
     }
+    
+    
 }
