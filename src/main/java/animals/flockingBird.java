@@ -29,6 +29,7 @@ public final class flockingBird extends animal {
     double alignment;
     double separation;
     List<flockingBird> animals_in_range;
+    ArrayList<predatorBird> known_predators;
 
     public flockingBird(double xLoc, double yLoc, double newcohesion, double newalignment, double newseparation) {
         speed = ThreadLocalRandom.current().nextInt(50, 100);
@@ -93,9 +94,10 @@ public final class flockingBird extends animal {
         }
     }
 
-    private void line_of_sight(List<flockingBird> flock) {
+    private void line_of_sight(List<flockingBird> flock, ArrayList<predatorBird> predators) {
         /* Locates others in range */
         animals_in_range = new ArrayList<>();
+        known_predators = new ArrayList<>();
         for (flockingBird bird : flock) {
 
             if (bird != this) { //Are birds self aware?
@@ -106,13 +108,20 @@ public final class flockingBird extends animal {
                 animals_in_range.add(bird);
             }
         }
+        for (predatorBird predator : predators) {
+            double distance = this.get_distance(predator.get_position());
+            if (distance > view_radius) {
+                continue;
+            }
+            known_predators.add(predator);
+        }
     }
 
     private double avoid(double AverageX, double AverageY) {
         /* Find separation angle */
         double angle = (CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY)));
         if (angle <= 0) {
-            /* This makes it rotate the right way round the circle */
+            /* This makes it rotate the right way round the circle when turning to avoid */
             angle += Math.PI;
             /* Draw it out on paper if you're not sure */
             angle *= separation;
@@ -121,6 +130,40 @@ public final class flockingBird extends animal {
             angle *= separation;
         }
         return angle;
+    }
+
+    private double avoid_predator() {
+        /* Avoid predators */
+        double shortest_distance = 1000, angle = 0;
+        predatorBird closest;
+        for (predatorBird predator : known_predators) {
+            if (this.get_distance(predator.get_position()) < shortest_distance) {
+                shortest_distance = this.get_distance(predator.get_position());
+                closest = predator;
+                angle = CartesianCoordinate.angle_between(position, closest.get_position());
+            }
+        }
+        
+        if (angle <= 0) {
+            /* This makes it rotate the right way round the circle when turning to avoid */
+            angle += Math.PI;
+            angle /= shortest_distance / 20;
+            /* Draw it out on paper if you're not sure */
+        } else {
+            angle -= Math.PI;
+            angle /= shortest_distance / 20;
+        }
+        return angle;
+    }
+
+    private boolean check_if_eaten() {
+        for (predatorBird predator : known_predators) {
+            if (this.get_distance(predator.get_position()) < 10) {
+                this.reset_bird();
+                return true;
+            }
+        }
+        return false;
     }
 
     private double cohesion(double AverageX, double AverageY) {
@@ -182,8 +225,8 @@ public final class flockingBird extends animal {
         set_position(Get_Direction_Position());
     }
 
-    public void navigate(List<flockingBird> flock, double canvas_X, double canvas_Y, List<obstacle> obstacles) {
-        line_of_sight(flock);
+    public void navigate(List<flockingBird> flock, double canvas_X, double canvas_Y, List<obstacle> obstacles, ArrayList<predatorBird> predators) {
+        line_of_sight(flock, predators);
         wrap(canvas_X, canvas_Y);
         double averageX = 0;
         double averageY = 0;
@@ -203,12 +246,13 @@ public final class flockingBird extends animal {
             averageAng = averageAng / (animals_in_range.size());
             set_local_COM(new CartesianCoordinate(averageX, averageY));
             if (!bounce(obstacles)) {
-                set_target_angle(cohesion(averageX, averageY) + alignment(averageAng) + avoid(averageX, averageY));
+                set_target_angle(cohesion(averageX, averageY) + alignment(averageAng) + avoid(averageX, averageY) + avoid_predator());
                 seek();
             }
         } else if (!bounce(obstacles)) {
             seek();
         }
+        check_if_eaten();
     }
 
     public double get_cohesion() {

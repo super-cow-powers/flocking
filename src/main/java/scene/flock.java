@@ -11,6 +11,7 @@ import geometry.CartesianCoordinate;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +24,8 @@ public class flock implements scene_object {
     //private flockingBird flock_members[];
     private List<flockingBird> flock_members = new ArrayList<>();
     private ArrayList<obstacle> obstacles;
-
+    private ArrayList<predatorBird> predators = new ArrayList<>(); /* Predators are attached to each flock. I.e they eat a particular type of bird */
+                                                                   /* I could make them a flock_member, but I don't think that'd be appropriate    */
     flock(int size, double cohesion, double alignment, double separation, ArrayList<obstacle> Obstacles) {
         obstacles = Obstacles;
         int j = 0, i = 0;
@@ -38,20 +40,8 @@ public class flock implements scene_object {
             }
             i += 25;
         }
-    }
-
-    @Override
-    public void draw(Canvas canvas, boolean debug) {
-        for (animal flock_member : flock_members) {
-            //canvas.draw_triangle(flock_member.get_position(), 10, flock_member.get_angle(), Color.blue, Color.black, Color.blue); //Slower
-            //canvas.drawLineSegments(flock_member.get_segments());
-            canvas.drawBird(flock_member);
-            if (debug == true) {
-                canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
-                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
-                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
-                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Direction_Position(), Color.green);
-            }
+        for (int l = 0; l< ThreadLocalRandom.current().nextInt(1, 3); l++){ //Add up to 2 predators at random
+            predators.add(new predatorBird((double)ThreadLocalRandom.current().nextInt(400, 600), (double)ThreadLocalRandom.current().nextInt(400, 600), flock_members));
         }
     }
 
@@ -97,9 +87,24 @@ public class flock implements scene_object {
     }
 
     private void update_members(int number, double canvas_X, double canvas_Y, Canvas canvas) {
-
         for (int i = (((number - 1) * flock_members.size()) / 3); i < (int) ((number * flock_members.size()) / 3); i++) {
-            flock_members.get(i).navigate(flock_members, canvas_X, canvas_Y, obstacles);
+            flock_members.get(i).navigate(flock_members, canvas_X, canvas_Y, obstacles, predators);
+        }
+    }
+    
+    @Override
+    public void draw(Canvas canvas, boolean debug) {
+        for (animal flock_member : flock_members) {
+            canvas.drawBird(flock_member);
+            if (debug == true) { /* Show Targeting Info */
+                canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
+                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
+                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
+                canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Direction_Position(), Color.green);
+            }
+        }
+        for (animal predator : predators){
+            canvas.drawBird(predator);
         }
     }
 
@@ -146,7 +151,9 @@ public class flock implements scene_object {
         } catch (InterruptedException ex) {
             Logger.getLogger(flock.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        for (predatorBird predator : predators){
+            predator.navigate(canvas_X, canvas_Y, obstacles);
+        }
         /*
         for (animal flock_member : flock_members) {
             System.out.printf("COM: (%f,%f)\n", flock_member.get_local_COM().getX(),flock_member.get_local_COM().getX());
