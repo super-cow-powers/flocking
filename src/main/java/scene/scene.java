@@ -75,7 +75,8 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
     private JPanel RightPanel;
     private JPanel boids_panel;
 
-    public scene(CartesianCoordinate obstacle_loc, int obstacle_radius, int obstacle_complexity) {
+    public scene(CartesianCoordinate obstacle_loc, int obstacle_radius) {
+        int obstacle_complexity = (int) (obstacle_radius * 1.5);
         Obstacles = new ArrayList<obstacle>();
         /* Can use multiple obstacles */
         bird_flocks = new ArrayList<flock>();
@@ -88,7 +89,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
     private void setup_RightPanel() {
         RightPanel = new JPanel();
         RightPanel.setLayout(new GridLayout(15, 1));
-        JButton reset_Button = new JButton("Reset Flock");
+        JButton reset_Button = new JButton("Set Size & Reset");
         reset_Button.setToolTipText("Resets behavoiur and creates new flock with set size at the origin");
         reset_Button.setActionCommand("reset");
         reset_Button.addActionListener(this);
@@ -162,7 +163,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 0, 5, Color.black));
         RightPanel.revalidate();
         frame.add(RightPanel, BorderLayout.EAST);
-        frame.revalidate();
+        frame.revalidate();/* Important! The frame must be validated to make it lay itself out */
         frame.repaint();
     }
 
@@ -189,7 +190,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         BottomPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.black));
         BottomPanel.revalidate();
         frame.add(BottomPanel, BorderLayout.SOUTH);
-        frame.revalidate();
+        frame.revalidate();/* Important! The frame must be validated to make it lay itself out */
     }
 
     private void setup_BoidsPanel() {
@@ -200,7 +201,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         canvas.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.black));
         boids_panel.add(canvas);
         frame.add(boids_panel, BorderLayout.WEST);
-        frame.revalidate();
+        frame.revalidate();/* Important! The frame must be validated to make it lay itself out */
         frame.repaint();
     }
 
@@ -210,7 +211,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         frame.setSize(WINDOW_X_SIZE, WINDOW_Y_SIZE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true); //Hello
-        frame.setResizable(false);
+        frame.setResizable(false);/* I can't have just anyone resizing the window now, can I? */
         frame.setLayout(new BorderLayout());
     }
 
@@ -230,7 +231,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
     private void establish() {
         scene_objects = new ArrayList<scene_object>();
         setup_GUI();
-        /* I can't have just anyone resizing the window now, can I? */
+        
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) { //Goodbye
@@ -238,7 +239,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
             }
         });
 
-        /* Important! The frame must be validated to make it lay itself out */
+        
         scene_objects.addAll(Obstacles);
         scene_objects.addAll(bird_flocks);
         redraw_scene();

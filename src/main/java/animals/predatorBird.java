@@ -5,7 +5,6 @@
  */
 package animals;
 
-import drawing.Canvas;
 import geometry.CartesianCoordinate;
 import java.io.File;
 import java.io.IOException;
@@ -52,10 +51,11 @@ public class predatorBird extends animal {
     public void navigate(double canvas_X, double canvas_Y, List<obstacle> obstacles) {
         wrap(canvas_X, canvas_Y);
         bounce(obstacles);
-        target_angle = 0;
+        double new_target_angle = 0;
         for (flockingBird bird : prey) {
-            set_target_angle(target_angle + (CartesianCoordinate.angle_between(position, bird.get_position()) / (this.get_distance(bird.get_position()) / 10)));
+            new_target_angle += (CartesianCoordinate.angle_between(position, bird.get_position()) / (this.get_distance(bird.get_position()) / 10));
         }
+        set_target_angle(new_target_angle);
         seek();
     }
 
