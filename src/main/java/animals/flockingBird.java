@@ -143,7 +143,7 @@ public final class flockingBird extends animal {
                 angle = CartesianCoordinate.angle_between(position, closest.get_position());
             }
         }
-        
+
         if (angle <= 0) {
             /* This makes it rotate the right way round the circle when turning to avoid */
             angle += Math.PI;
@@ -182,46 +182,18 @@ public final class flockingBird extends animal {
     }
 
     private void seek() {
-        /*
-        double rad_dist = angular_velocity / 60, temp_angleA = direction_angle, temp_angleB;
-        int count, sign = 1;
-        int[] radial_count = new int[2];
-        System.out.printf("Percent %f\n", direction_angle/target_angle);
-        if (direction_angle/target_angle < 0.9 | direction_angle/target_angle > 1.1 | target_angle == 0) {
-           //System.out.printf("Seeking\n");
-            for (int i = 0; i < 2; i++) {
-                temp_angleA = direction_angle; 
-                count = 0;
-                while (count <= 360) {
-                    temp_angleB = temp_angleA;
-                    temp_angleA += sign * 0.2;
-                    if (temp_angleA > Math.PI) {
-                        temp_angleA = temp_angleA - (2 * Math.PI);
-                    } else if (temp_angleA < -Math.PI) {
-                        temp_angleA = temp_angleA + (2 * Math.PI);
-                    }
-                    if ((temp_angleA > target_angle && temp_angleB < target_angle) | (temp_angleA < target_angle && temp_angleB > target_angle)) {
-                        radial_count[i] = count;
-                        count = 361;
-                        
-                    }
-                    count++;
-                }
-                sign = sign * (-1);
-            }
-            System.out.printf("Seekd %d %d\n", radial_count[0], radial_count[1]);
-            sign = (radial_count[0] > radial_count[1]) ? -1 : 1;
-            System.out.printf("Sign: %d\n",sign);
-            temp_angleA = direction_angle + (rad_dist * sign);
-            if (temp_angleA > Math.PI) {
-                temp_angleA -= Math.PI * 2;
-            } else if (temp_angleA < -Math.PI) {
-                temp_angleA += Math.PI * 2;
-            }
 
-        }*/
+        double angle = target_angle - direction_angle;
+        if (Math.abs(angle) <= Math.PI){
+            angle = angle; //Left here for logic clarity
+        } else if (direction_angle <= 0){
+            angle = (-1)*((2*Math.PI) - Math.abs(angle));
+        } else if (target_angle <=0){
+            angle = ((2*Math.PI) - Math.abs(angle));
+        }
+        
 
-        set_direction_angle(target_angle);
+        set_direction_angle(get_direction_angle()+(angle/10));
         set_position(Get_Direction_Position());
     }
 
@@ -240,7 +212,7 @@ public final class flockingBird extends animal {
                         this.get_position().getY() + ThreadLocalRandom.current().nextInt(-10, 10))); //Trys to split up a flock that is too dense. Uses thread-safe random
             }
         }
-        if (!animals_in_range.isEmpty()) { //=Only do if there are things in range. Remember... Only YOU Can Prevent Divide By Zeros!
+        if (!animals_in_range.isEmpty()) { //Only do if there are things in range. Remember... Only YOU Can Prevent Divide By Zeros!
             averageX = averageX / (animals_in_range.size());
             averageY = averageY / (animals_in_range.size());
             averageAng = averageAng / (animals_in_range.size());
