@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is the Canvas class from the labs.
+ * I have edited paint to draw images (the birds),
+ * and have added a drawBird method to draw birds.
  */
 package drawing;
 

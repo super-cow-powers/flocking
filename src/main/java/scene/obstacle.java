@@ -1,13 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is an obstacle. It is a scene_object
+ * It's quite boring.
  */
 package scene;
 
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
-import geometry.LineSegment;
 import java.awt.Color;
 
 /**
@@ -18,15 +16,13 @@ public final class obstacle implements scene_object {
 
     private final CartesianCoordinate centre;
     private final int radius;
-    private LineSegment segments[];
-
+    
+    /*
+     * Size is radius in px, complexity is number of edges to draw; more complex=more circular but slower
+     */
     public obstacle(CartesianCoordinate centre_loc, int size, int complexity) {
         centre = centre_loc;
         radius = size;
-    }
-
-    public int get_radius() {
-        return radius;
     }
     
     @Override
@@ -36,7 +32,7 @@ public final class obstacle implements scene_object {
 
     @Override
     public void draw(Canvas canvas, boolean debug) {
-        canvas.draw_circle(centre, radius, 100, 0, Color.red);
+        canvas.draw_circle(centre, radius, 100, 0, Color.red); //Red is obstacle-ish, right?
     }
 
     @Override

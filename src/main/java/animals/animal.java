@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This contains the base animal class.
+ * All other animals should extend this
  */
 package animals;
 
@@ -42,12 +41,14 @@ public class animal {
 
     public CartesianCoordinate Get_Direction_Position() { /* returns the position that the bird will be in if the direction (actual) angle is followed */
         double distance = speed / 60; /* The simulation speed has a multiplier of 1 at 60 updates/second - so speed*1 (px/s) is dist/(1/60) */
-        return new CartesianCoordinate(position.getX() + (Math.cos((direction_angle)) * distance) + 0.5, position.getY() + (Math.sin((direction_angle)) * distance));
+        /* Adding 0.2 here just keeps the Boid moving */
+        return new CartesianCoordinate(position.getX() + (Math.cos((direction_angle)) * distance) + 0.2, position.getY() + (Math.sin((direction_angle)) * distance));
     }
 
     public CartesianCoordinate Get_Target_Position() { /* returns the position that the bird will be in if the target angle is followed */
-        double distance = speed / 60;
-        return new CartesianCoordinate(position.getX() + (Math.cos((target_angle)) * distance) + 0.5, position.getY() + (Math.sin((target_angle)) * distance));
+        double distance = speed / 60; 
+        /* Adding 0.2 here just keeps the Boid moving */
+        return new CartesianCoordinate(position.getX() + (Math.cos((target_angle)) * distance) + 0.2, position.getY() + (Math.sin((target_angle)) * distance));
     }
 
     public double get_target_angle() {

@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file contains the flock class,
+ * which the Boids are associated with.
+ * It is drawn to the scene.
  */
 package scene;
 
@@ -24,8 +24,10 @@ public class flock implements scene_object {
     //private flockingBird flock_members[];
     private List<flockingBird> flock_members = new ArrayList<>();
     private ArrayList<obstacle> obstacles;
-    private ArrayList<predatorBird> predators = new ArrayList<>(); /* Predators are attached to each flock. I.e they eat a particular type of bird */
-                                                                   /* I could make them a flock_member, but I don't think that'd be appropriate    */
+    private ArrayList<predatorBird> predators = new ArrayList<>();
+
+    /* Predators are attached to each flock. I.e they eat a particular type of bird.       */
+   /* I could make them a flock_member too, but I don't think that'd be quite appropriate */
     flock(int size, double cohesion, double alignment, double separation, ArrayList<obstacle> Obstacles) {
         obstacles = Obstacles;
         int j = 0, i = 0;
@@ -40,8 +42,8 @@ public class flock implements scene_object {
             }
             i += 25;
         }
-        for (int l = 0; l< ThreadLocalRandom.current().nextInt(1, 3); l++){ //Add up to 2 predators at random
-            predators.add(new predatorBird((double)ThreadLocalRandom.current().nextInt(400, 600), (double)ThreadLocalRandom.current().nextInt(400, 600), flock_members));
+        for (int l = 0; l < ThreadLocalRandom.current().nextInt(1, 3); l++) { //Add up to 2 predators at random
+            predators.add(new predatorBird((double) ThreadLocalRandom.current().nextInt(400, 600), (double) ThreadLocalRandom.current().nextInt(400, 600), flock_members));
         }
     }
 
@@ -62,12 +64,19 @@ public class flock implements scene_object {
             bird.set_alignment(ammount);
         }
     }
-    
+
+    /*
+    *@param ammount number between -1 and 1
+     */
     public void set_separation(double separation) {
         for (flockingBird bird : flock_members) {
             bird.set_separation(separation);
         }
     }
+
+    /*
+    *@param ammount number between 0 and n
+     */
     public void set_viewRadius(int new_Radius) {
         for (flockingBird bird : flock_members) {
             bird.set_viewRadius(new_Radius);
@@ -78,32 +87,33 @@ public class flock implements scene_object {
     public void update_st(Canvas canvas) {
         double canvas_X = canvas.getWidth(), canvas_Y = canvas.getHeight();
         //Single Threaded version. DEBUG ONLY
-        update_members(1, canvas_X, canvas_Y, canvas);
-        update_members(2, canvas_X, canvas_Y, canvas);
-        update_members(3, canvas_X, canvas_Y, canvas);
+        update_members(1, canvas_X, canvas_Y);
+        update_members(2, canvas_X, canvas_Y);
+        update_members(3, canvas_X, canvas_Y);
         //for (animal flock_member : flock_members) {
         //  System.out.printf("ANG: (%f)\n", flock_member.get_angle());
         //}
     }
 
-    private void update_members(int number, double canvas_X, double canvas_Y, Canvas canvas) {
+    private void update_members(int number, double canvas_X, double canvas_Y) {
         for (int i = (((number - 1) * flock_members.size()) / 3); i < (int) ((number * flock_members.size()) / 3); i++) {
             flock_members.get(i).navigate(flock_members, canvas_X, canvas_Y, obstacles, predators);
         }
     }
-    
+
     @Override
     public void draw(Canvas canvas, boolean debug) {
         for (animal flock_member : flock_members) {
             canvas.drawBird(flock_member);
-            if (debug == true) { /* Show Targeting Info */
+            if (debug == true) {
+                /* Show Targeting Info */
                 canvas.draw_circle(flock_member.get_local_COM(), 3, 4, 0, Color.blue);
                 canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.get_local_COM(), Color.red);
                 canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Target_Position(), Color.yellow);
                 canvas.drawLineBetweenPoints(flock_member.get_position(), flock_member.Get_Direction_Position(), Color.green);
             }
         }
-        for (animal predator : predators){
+        for (animal predator : predators) {
             canvas.drawBird(predator);
         }
     }
@@ -115,28 +125,28 @@ public class flock implements scene_object {
 
         /*Threaded version. 
         Kind of trashy, but has no need to be anything other really - as it's the most simple way
-        to implement what I want. Still Pegs my G5 though.
+        to implement what I want. Still Pegs my Quad G5 though.
          */
         Thread t, t1, t2; //Create 3 calculation threads to split the large task
         t = new Thread(new Runnable() { // Create an anonymous inner class that implements Runnable interface
             @Override
             public void run() {
                 // Thread's running behavior
-                update_members(1, canvas_X, canvas_Y, canvas);
+                update_members(1, canvas_X, canvas_Y);
 
             }
         });
         t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                update_members(2, canvas_X, canvas_Y, canvas);
+                update_members(2, canvas_X, canvas_Y);
 
             }
         });
         t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                update_members(3, canvas_X, canvas_Y, canvas);
+                update_members(3, canvas_X, canvas_Y);
 
             }
         });
@@ -145,19 +155,18 @@ public class flock implements scene_object {
         t2.start();
 
         try {
-            t2.join(); //pause main thread till calculation threads complete
+            t.join(); //pause main thread till calculation threads complete
             t1.join();
-            t.join();
+            t2.join();
         } catch (InterruptedException ex) {
             Logger.getLogger(flock.class.getName()).log(Level.SEVERE, null, ex);
         }
-        for (predatorBird predator : predators){
+        for (predatorBird predator : predators) {//Update the predator/s
             predator.navigate(canvas_X, canvas_Y, obstacles);
         }
         /*
         for (animal flock_member : flock_members) {
             System.out.printf("COM: (%f,%f)\n", flock_member.get_local_COM().getX(),flock_member.get_local_COM().getX());
-
         }
          */
     }

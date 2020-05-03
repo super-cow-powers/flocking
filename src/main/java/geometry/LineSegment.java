@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is the line class from the Labs.
+ * I have added some colouring methods.
  */
 package geometry;
 import java.awt.Color;
@@ -40,11 +39,11 @@ public class LineSegment {
     public Color get_colour(){
      return colour;   
     }
-    public void set_rgba(int r, int g, int b, int alpha){ //Integer between 0 and 255 to specify the colour
+    public void set_colour(int r, int g, int b, int alpha){ //Integers between 0 and 255 to specify the colour
         colour = new Color(r,g,b,alpha);
     }
     
-    public void set_colour(Color Colour){ //Integer between 0 and 255 to specify the colour
+    public void set_colour(Color Colour){ //Overloaded, set colour using a Java Color
         colour = Colour;
     }
     

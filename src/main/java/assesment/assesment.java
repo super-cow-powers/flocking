@@ -14,10 +14,8 @@ import scene.scene;
  */
 public class assesment {
 
-    private scene active_scene;
-
     private void setup_scene(CartesianCoordinate obstacle_location, int obstacle_radius) {
-        active_scene = new scene(obstacle_location, obstacle_radius);
+        scene active_scene = new scene(obstacle_location, obstacle_radius);
     }
 
     /**
@@ -26,9 +24,8 @@ public class assesment {
     public static void main(String[] args) throws InterruptedException { //If either thread is interrupted - terminate.
         CartesianCoordinate obstacle_location = new CartesianCoordinate(350, 250);
         assesment assesmentMain = new assesment();
-        assesmentMain.setup_scene(obstacle_location, 75);
-        System.out.println("g5.assesment.assesment.main()");
-
+        assesmentMain.setup_scene(obstacle_location, 75); //Initialise
+        System.out.println("Loading Done.");
     }
 
 }

@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is the Predator, it eats flocking birds.
+ * It is an animal - it is final.
  */
 package animals;
 
@@ -21,7 +20,7 @@ import scene.scene_object;
  *
  * @author REDACTED
  */
-public class predatorBird extends animal {
+public final class predatorBird extends animal {
 
     private List<flockingBird> prey;
 
@@ -32,18 +31,19 @@ public class predatorBird extends animal {
         direction_angle = 0;
         bouncing = 0;
         position = new CartesianCoordinate(xLoc, yLoc);
+        /* Trys to import the sprite for the bird */
         try {
-            image = ImageIO.read(new File("predator.png"));
+            image = ImageIO.read(new File("predator.png"));//Netbeans finds it here
         } catch (IOException e) {
             try {
-                image = ImageIO.read(new File("assets/predator.png"));
+                image = ImageIO.read(new File("assets/predator.png"));//java assesment.assesment finds it here
             } catch (IOException ex) {
-                Logger.getLogger(flockingBird.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(flockingBird.class.getName()).log(Level.SEVERE, null, ex); //If it isn't at either place, scream.
             }
         }
     }
 
-    private void seek() {
+    private void seek() { //Set angle directly, rather than seeking like the Flocking Bird
         set_direction_angle(target_angle);
         set_position(Get_Direction_Position());
     }
@@ -62,13 +62,11 @@ public class predatorBird extends animal {
     @Override
     protected boolean bounce(List<obstacle> obstacles) {
         /* Kill the bird if it hits the obstacle. */
-        if (bouncing == 0) {
-            for (scene_object obstacle : obstacles) {
-                if (this.get_distance(obstacle.get_location()) <= obstacle.get_size()+5) {
-                    set_position(new CartesianCoordinate((double) ThreadLocalRandom.current().nextInt(400, 600), (double) ThreadLocalRandom.current().nextInt(400, 600)));
-                    /* Resurrect it elsewhere */
-                    return true;
-                }
+        for (scene_object obstacle : obstacles) {
+            if (this.get_distance(obstacle.get_location()) <= obstacle.get_size() + 5) {
+                set_position(new CartesianCoordinate((double) ThreadLocalRandom.current().nextInt(400, 600), (double) ThreadLocalRandom.current().nextInt(400, 600)));
+                /* Resurrect it elsewhere */
+                return true;
             }
         }
         return false;

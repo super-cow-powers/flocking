@@ -14,7 +14,7 @@ import geometry.CartesianCoordinate;
  *
  * @author REDACTED
  * Defines an interface for the objects being drawn to the scene
- * draw draw's the object.
+ * draw draw's the object - if debug is true extra information should be shown.
  * update update's the object's current state.
  * get_location returns the object's co-ordinates. Not defined for objects with multiple contained members (i.e flock).
  * get_size returns a double as the size of the object (i.e obstacle radius, flock number).
@@ -22,7 +22,7 @@ import geometry.CartesianCoordinate;
  */
 public interface scene_object {
     public void draw(Canvas canvas, boolean debug);
-    public void update(Canvas canvas);
+    public void update(Canvas canvas);  
     public CartesianCoordinate get_location();
     public double get_size();
     public String get_class();

@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is the Bird which flocks.
+ * It is an animal, it is final.
  */
 package animals;
 
@@ -59,7 +58,7 @@ public final class flockingBird extends animal {
     public void set_cohesion(double ammount) {
         /* I told you the ranges were enforced, didn't I */
         if (ammount <= 1) {
-            /* Oh, and these are public so that I can change them without making a new bird */
+            /* These are public so that I can change them without making a new bird */
             cohesion = ammount;
         } else if (ammount > 1) {
             System.out.println("Hey, so your Cohesion should be between 0 and 1, yours is >1. Would you check it please? I've set it to 1 for now.");
@@ -99,11 +98,10 @@ public final class flockingBird extends animal {
         animals_in_range = new ArrayList<>();
         known_predators = new ArrayList<>();
         for (flockingBird bird : flock) {
-
             if (bird != this) { //Are birds self aware?
                 double distance = this.get_distance(bird.get_position());
                 if (distance > view_radius) {
-                    continue;
+                    continue;//If out of range, do nothing
                 }
                 animals_in_range.add(bird);
             }
@@ -111,13 +109,13 @@ public final class flockingBird extends animal {
         for (predatorBird predator : predators) {
             double distance = this.get_distance(predator.get_position());
             if (distance > view_radius) {
-                continue;
+                continue; //If out of range, do nothing
             }
-            known_predators.add(predator);
+            known_predators.add(predator); //If in range, see it.
         }
     }
 
-    private double avoid(double AverageX, double AverageY) {
+    private double avoid(double AverageX, double AverageY) { //Give it the centre of mass as X and Y.
         /* Find separation angle */
         double angle = (CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY)));
         if (angle <= 0) {
@@ -156,7 +154,7 @@ public final class flockingBird extends animal {
         return angle;
     }
 
-    private boolean check_if_eaten() {
+    private boolean check_if_eaten() { //Am I dead?
         for (predatorBird predator : known_predators) {
             if (this.get_distance(predator.get_position()) < 10) {
                 this.reset_bird();
@@ -166,44 +164,40 @@ public final class flockingBird extends animal {
         return false;
     }
 
-    private double cohesion(double AverageX, double AverageY) {
+    private double cohesion(double AverageX, double AverageY) {//Give it the centre of mass as X and Y.
         /* Find cohesion angle */
         double ret_ang = ((CartesianCoordinate.angle_between(position, new CartesianCoordinate(AverageX, AverageY))) * cohesion);
         /*This business of making new coords for each is perhaps not most efficient, */
  /*but with a good underlying architecture, it makes naff-all difference      */
-
         return ret_ang;
     }
 
-    private double alignment(double average_angle) {
+    private double alignment(double average_angle) { //Git it the average angle of all other Boids in range
         double ret_ang = (average_angle) * alignment;
-
         return ret_ang;
     }
 
     private void seek() {
-
         double angle = target_angle - direction_angle;
-        if (Math.abs(angle) <= Math.PI){
-            angle = angle; //Left here for logic clarity
-        } else if (direction_angle <= 0){
-            angle = (-1)*((2*Math.PI) - Math.abs(angle));
-        } else if (target_angle <=0){
-            angle = ((2*Math.PI) - Math.abs(angle));
+        if (Math.abs(angle) > Math.PI) { /*This block ensures that the Boid seeks in the shortest direction*/
+            if (direction_angle <= 0) {
+                angle = (-1) * ((2 * Math.PI) - Math.abs(angle));
+            } else if (target_angle <= 0) {
+                angle = ((2 * Math.PI) - Math.abs(angle));
+            }
         }
-        
-
-        set_direction_angle(get_direction_angle()+(angle/10));
+        set_direction_angle(get_direction_angle() + (angle / 10));
         set_position(Get_Direction_Position());
     }
 
     public void navigate(List<flockingBird> flock, double canvas_X, double canvas_Y, List<obstacle> obstacles, ArrayList<predatorBird> predators) {
+        /* This makes the Boid fly */
         line_of_sight(flock, predators);
-        wrap(canvas_X, canvas_Y);
+        wrap(canvas_X, canvas_Y); //Wrap to other side if at edge
         double averageX = 0;
         double averageY = 0;
         double averageAng = 0;
-        for (flockingBird bird : animals_in_range) {
+        for (flockingBird bird : animals_in_range) { //Find averages
             averageX += bird.get_position().getX();
             averageY += bird.get_position().getY();
             averageAng += bird.get_target_angle();
@@ -217,14 +211,14 @@ public final class flockingBird extends animal {
             averageY = averageY / (animals_in_range.size());
             averageAng = averageAng / (animals_in_range.size());
             set_local_COM(new CartesianCoordinate(averageX, averageY));
-            if (!bounce(obstacles)) {
+            if (!bounce(obstacles)) { //If it's meant to be bouncing, don't set a new direcion
                 set_target_angle(cohesion(averageX, averageY) + alignment(averageAng) + avoid(averageX, averageY) + avoid_predator());
                 seek();
             }
-        } else if (!bounce(obstacles)) {
-            seek();
+        } else if (!bounce(obstacles)) { //If nothing is in range and it's not bouncing:
+            seek(); //keep going in the same direction
         }
-        check_if_eaten();
+        check_if_eaten(); //Am I dead?
     }
 
     public double get_cohesion() {

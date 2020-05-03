@@ -1,11 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is the Scene class.
+ * It controls most of the operation of the programme,
+ * containing the GUI, and methods to control the Boids.
  */
 package scene;
 
-import animals.predatorBird;
 import drawing.Canvas;
 import geometry.CartesianCoordinate;
 import java.awt.BorderLayout;
@@ -18,25 +17,21 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.concurrent.ThreadLocalRandom;
-import javax.sql.rowset.serial.SerialArray;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+/* I could import swing.* but swing is quite big, so I'd rather not*/
 
 /**
  *
@@ -54,22 +49,22 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
     private final int WINDOW_Y_SIZE = 768;
     /* XGA is used, as it will fit easily into anything recent
                                             * without being too small */
-    private final double default_cohesion = 0.5;
+    private final double default_cohesion = 0.7;
     private final double default_alignment = 0.5;
-    private final double default_separation = 0.5;
-    private double cohesion = default_cohesion;
-    private double alignment = default_alignment;
-    private double separation = default_separation;
-    private final int viewRadiusDEF = 100;
-    private int viewRadius = viewRadiusDEF;
-    private Timer timer;
-    private boolean paused = false;
-    private boolean debug = false;
-    private final int updates_sMIN = 0;
-    private final int updates_sMAX = 300;
-    private final int updates_sDEF = 60;
-    private final int flock_sizeDEF = 20;
-    private int flock_size = flock_sizeDEF;
+    private final double default_separation = 0.4;
+    private double cohesion = default_cohesion; //This value may be updated by the user
+    private double alignment = default_alignment; //This value may be updated by the user
+    private double separation = default_separation; //This value may be updated by the user
+    private final int viewRadiusDEF = 100; //Default view radius
+    private int viewRadius = viewRadiusDEF; //This value may be updated by the user
+    private Timer timer; //A timer. Does the animation
+    private boolean paused = false; //Am I stopped? This value may be updated by the user
+    private boolean debug = false; //Am I in debug mode? This value may be updated by the user
+    private final int updates_sMIN = 0; //Minimum updates/second
+    private final int updates_sMAX = 300; //Maximum updates/second
+    private final int updates_sDEF = 60; //Default updates/second
+    private final int flock_sizeDEF = 20; //Default flock size
+    private int flock_size = flock_sizeDEF; //This value may be updated by the user
 
     private JPanel BottomPanel;
     private JPanel RightPanel;
@@ -86,10 +81,43 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         establish();
     }
 
+    private void establish() {
+        scene_objects = new ArrayList<scene_object>();
+        setup_GUI();
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) { //Goodbye
+                System.exit(0);
+            }
+        });
+
+        scene_objects.addAll(Obstacles);
+        scene_objects.addAll(bird_flocks);
+        redraw_scene();
+        timer.start(); //Start animation
+    }
+
+    private void set_Flock_parameters(double newCohesion, double newAlignment, double newSeparation, int newRadius) {
+        /*Sets the parameters of all flocks   */
+        for (scene_object obj : scene_objects) {
+            /*If I were using multiple flocks     */
+            if (obj.get_class().equals("scene.flock")) {
+                /*this should be modified. But I'm not*/
+                flock flk = (flock) obj;
+                flk.set_cohesion(newCohesion);
+                flk.set_alignment(newAlignment);
+                flk.set_separation(newSeparation);
+                flk.set_viewRadius(newRadius);
+            }
+        }
+    }
+
     private void setup_RightPanel() {
+        /* Create a pannel on the right, with controls in it */
         RightPanel = new JPanel();
         RightPanel.setLayout(new GridLayout(15, 1));
-        JButton reset_Button = new JButton("Set Size & Reset");
+        JButton reset_Button = new JButton("Set Size & Reset"); //Reset button
         reset_Button.setToolTipText("Resets behavoiur and creates new flock with set size at the origin");
         reset_Button.setActionCommand("reset");
         reset_Button.addActionListener(this);
@@ -101,13 +129,14 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.add(extra_Button);
 
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+        /*Create a new hash table, mapping n->n/10 because I can only use ints in a slider*/
         for (int i = 0; i <= 10; i += 2) {
             double label = ((double) i / 10);
             labelTable.put(i, new JLabel(Double.toString(label)));
         }
 
-        JSlider cohesionSlider = new JSlider(JSlider.HORIZONTAL,
-                0, 10, 5);
+        JSlider cohesionSlider = new JSlider(JSlider.HORIZONTAL,//Cohesion control
+                0, 10, (int)(cohesion*10));
         cohesionSlider.setLabelTable(labelTable);
         cohesionSlider.setName("cohesion");
         cohesionSlider.setMinorTickSpacing(1);
@@ -118,8 +147,8 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.add(cohesionlabel);
         RightPanel.add(cohesionSlider);
 
-        JSlider separationSlider = new JSlider(JSlider.HORIZONTAL,
-                0, 10, 5);
+        JSlider separationSlider = new JSlider(JSlider.HORIZONTAL, //Separation control
+                0, 10, (int)(separation*10));
         separationSlider.setLabelTable(labelTable);
         separationSlider.setName("separation");
         separationSlider.setMinorTickSpacing(1);
@@ -130,8 +159,8 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.add(separationlabel);
         RightPanel.add(separationSlider);
 
-        JSlider alignmentSlider = new JSlider(JSlider.HORIZONTAL,
-                0, 10, 5);
+        JSlider alignmentSlider = new JSlider(JSlider.HORIZONTAL, //Alignment control
+                0, 10, (int)(alignment*10));
         alignmentSlider.setLabelTable(labelTable);
         alignmentSlider.setName("alignment");
         alignmentSlider.setMinorTickSpacing(1);
@@ -142,7 +171,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.add(alignmentlabel);
         RightPanel.add(alignmentSlider);
 
-        JSlider viewJSlider = new JSlider(JSlider.HORIZONTAL,
+        JSlider viewJSlider = new JSlider(JSlider.HORIZONTAL, //View radius control
                 20, 100, viewRadiusDEF);
         viewJSlider.setMajorTickSpacing(20);
         viewJSlider.setMinorTickSpacing(1);
@@ -155,7 +184,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.add(viewJSlider);
 
         JLabel sizelabel = new JLabel("Flock Size", SwingConstants.CENTER);
-        JFormattedTextField flock_size_input = new JFormattedTextField();
+        JFormattedTextField flock_size_input = new JFormattedTextField();//Flock size input box
         flock_size_input.setValue(flock_size);
         flock_size_input.addPropertyChangeListener(this);
         RightPanel.add(sizelabel);
@@ -163,7 +192,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         RightPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 0, 5, Color.black));
         RightPanel.revalidate();
         frame.add(RightPanel, BorderLayout.EAST);
-        frame.revalidate();/* Important! The frame must be validated to make it lay itself out */
+        frame.revalidate();/* Important! The frame must be re/validated to make it lay itself out */
         frame.repaint();
     }
 
@@ -190,7 +219,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         BottomPanel.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.black));
         BottomPanel.revalidate();
         frame.add(BottomPanel, BorderLayout.SOUTH);
-        frame.revalidate();/* Important! The frame must be validated to make it lay itself out */
+        frame.revalidate();/* Important! The frame must be re/validated to make it lay itself out */
     }
 
     private void setup_BoidsPanel() {
@@ -220,42 +249,12 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         /* Create Timer */
         timer = new Timer((int) (1000 / updates_sDEF), this);
         timer.setActionCommand("timer");
-        /* Set up UI elements */
+        /* Set up UI elements and Add stuff to the window */
         setup_BottomPanel();
         setup_RightPanel();
         setup_BoidsPanel();
-        /* Add stuff to the window */
+
         frame.validate();
-    }
-
-    private void establish() {
-        scene_objects = new ArrayList<scene_object>();
-        setup_GUI();
-        
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) { //Goodbye
-                System.exit(0);
-            }
-        });
-
-        
-        scene_objects.addAll(Obstacles);
-        scene_objects.addAll(bird_flocks);
-        redraw_scene();
-        timer.start(); //Start animation
-    }
-
-    private void set_Flock_parameters(double newCohesion, double newAlignment, double newSeparation, int newRadius) { /*Sets the parameters of all flocks   */
-        for (scene_object obj : scene_objects) {                                                                      /*If I were using multiple flocks     */
-            if (obj.get_class().equals("scene.flock")) {                                                              /*this should be modified. But I'm not*/
-                flock flk = (flock) obj;
-                flk.set_cohesion(newCohesion);
-                flk.set_alignment(newAlignment);
-                flk.set_separation(newSeparation);
-                flk.set_viewRadius(newRadius);
-            }
-        }
     }
 
     @Override
@@ -315,9 +314,11 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
         }
     }
 
-    private void reset_defaults() { /* Resets to initial conditions */
+    private void reset_defaults() {
+        /* Resets to initial conditions */
         timer.stop();
         timer.setDelay(1000 / updates_sDEF);
+        paused = false;
         frame.getContentPane().removeAll();
         setup_BoidsPanel();
         setup_BottomPanel();
@@ -346,7 +347,7 @@ public class scene implements ActionListener, ChangeListener, PropertyChangeList
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
         JFormattedTextField sourceField = (JFormattedTextField) pce.getSource();
-        flock_size = ((Number) sourceField.getValue()).intValue();
+        flock_size = ((Number) sourceField.getValue()).intValue(); //Only returns integer numbers. Try using a letter, I dare you.
     }
 
 }
